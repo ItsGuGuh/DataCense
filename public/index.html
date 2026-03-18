@@ -1,371 +1,295 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="author" content="Gustavo Luigi Lasta">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wiki | Conhecimento em suas mãos</title>
-    <link rel="stylesheet" href="css/index.css">
+    <title>WikiTRC | Conhecimento em suas mãos</title>
+    <link rel="stylesheet" href="/css/index.css">
     <link rel="icon" type="image/png" href="/assets/logos/Logotipo_WikiTRC.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body x-data="wikiApp()">
+
+<body x-data="wikiApp()" :class="{ 'mode-8bit': konamiAtivado }">
+    
+    <div class="scanlines" x-show="konamiAtivado" x-cloak></div>
+
+    <div id="loading-screen" class="loading-container" style="display: none; opacity: 0;" x-ref="loader">
+        <div class="planet-container">
+            <div class="planet-loader">
+                <span id="loading-percentage">0%</span>
+            </div>
+            <div class="planet-ring-loader"></div>
+            <div class="moon-loader"></div>
+        </div>
+    </div>
+
+    <div class="eightbit-message" x-show="mostrarMensagemKonami" x-cloak x-transition:enter="anim-typewriter">
+        <i class="fas fa-gamepad"></i>
+        <span>SISTEMA REBOOT: CÓDIGO KONAMI ATIVADO!</span>
+    </div>
+
     <div class="split-screen">
-        <!-- Left Side - Space Scene -->
         <div class="space-scene">
             <canvas id="spaceCanvas"></canvas>
-            
-            <!-- Comet -->
             <div class="comet"></div>
-            
-            <!-- Planet System -->
             <div class="planet-system-container">
                 <div class="planet-system">
-                    <!-- Glow behind planet -->
                     <div class="planet-glow"></div>
-                    
-                    <!-- Planet -->
                     <div class="planet-wrapper">
                         <div class="planet">
                             <div class="planet-atmosphere"></div>
                             <div class="planet-ring"></div>
                         </div>
                     </div>
-                    
-                    <!-- Orbit Path -->
                     <div class="orbit-path"></div>
-                    
-                    <!-- Moon 1 (Orbit) -->
-                    <div class="moon-orbit moon-orbit-1">
-                        <div class="moon moon-1"></div>
-                    </div>
-                    
-                    <!-- Moon 2 (Smaller Orbit) -->
-                    <div class="moon-orbit moon-orbit-2">
-                        <div class="moon moon-2"></div>
-                    </div>
+                    <div class="moon-orbit moon-orbit-1"><div class="moon moon-1"></div></div>
+                    <div class="moon-orbit moon-orbit-2"><div class="moon moon-2"></div></div>
                 </div>
             </div>
-            
-            <!-- Space Message -->
             <div class="space-message">
                 <h2>EXPLORE O CONHECIMENTO</h2>
                 <p class="typing-effect">Acesse o Wiki e descubra um universo de informações</p>
             </div>
         </div>
-        
-        <!-- Right Side - Login Panel -->
+
         <div class="login-section">
             <div class="login-container">
-                <!-- Logo / Rocket Icon -->
                 <div class="logo-wrapper">
-                    <div class="logo-icon">
-                        <i class="fas fa-rocket"></i>
-                    </div>
+                    <img src="/assets/logos/Logo_WikiTRC.png" alt="WikiTRC Logo" 
+                         class="logo-image" 
+                         :class="{ 'pop-anim-active': logoAnimando }" 
+                         @click="animarLogo()">
                 </div>
-                
+
                 <h1>Seja Bem-Vindo</h1>
                 <p class="login-subtitle">Insira suas credenciais para acessar</p>
-                
+
                 <form class="form-login" @submit.prevent="fazerLogin">
-                    <!-- Username Input -->
                     <div class="input-group">
                         <span class="input-icon"><i class="fas fa-user"></i></span>
-                        <input type="text" x-model="loginData.username" placeholder="Login Wiki ou Matrícula" required>
+                        <input type="text" x-model="loginData.username" placeholder="Usuário (Ex: nome.sobrenome)" required>
                     </div>
-                    
-                    <!-- Password Input -->
+
                     <div class="input-group">
                         <span class="input-icon"><i class="fas fa-lock"></i></span>
-                        <input :type="mostrarSenha ? 'text' : 'password'" x-model="loginData.password" placeholder="Senha Wiki" required>
+                        <input :type="mostrarSenha ? 'text' : 'password'" x-model="loginData.password" placeholder="Senha do Windows" required>
                         <button type="button" class="toggle-password" @click="mostrarSenha = !mostrarSenha">
                             <i class="fas" :class="mostrarSenha ? 'fa-eye-slash' : 'fa-eye'"></i>
                         </button>
                     </div>
-                    
-                    <!-- Links -->
-                    <div class="login-links">
-                        <button type="button" class="link-btn" @click="modais.esqueciSenha = true">Esqueceu a senha?</button>
+
+                    <div class="action-container">
+                        <button type="button" class="help-btn" @click="modais.ajuda = true"><i class="fas fa-question"></i></button>
+                        <button type="submit" class="login-btn" :disabled="carregando">
+                            <span x-show="!carregando">Acessar Órbita</span>
+                            <span x-show="carregando"><i class="fas fa-spinner fa-spin"></i> Autenticando...</span>
+                        </button>
                     </div>
-                    
-                    <!-- Submit Button -->
-                    <button type="submit" class="login-btn" :disabled="carregando">
-                        <span x-show="!carregando">Acessar Órbita</span>
-                        <span x-show="carregando">
-                            <i class="fas fa-spinner fa-spin"></i> Conectando...
-                        </span>
-                    </button>
                 </form>
-                
-                <!-- Footer -->
+
                 <div class="trc-footer">
-                    <a href="https://trctaborda.com.br/" target="_blank">
-                        <span class="footer-text">Powered by TRC Taborda</span>
+                    <a href="https://trctaborda.com.br/" target="_blank" class="footer-link">
+                        <img src="/assets/logos/TRC_OUTRO_WHITE.png" alt="TRC Taborda" class="footer-logo">
+                        <span class="easter-egg">Powered by Gustavo L. Lasta</span>
                     </a>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Modal Overlay -->
-    <div class="popup-overlay" x-show="modais.primeiroAcesso || modais.esqueciSenha" style="display: none;" x-transition.opacity></div>
-    
-    <!-- First Access Modal -->
-    <div class="modal first-login-popup" x-show="modais.primeiroAcesso" style="display: none;" x-transition>
+
+    <div class="popup-overlay" x-show="modais.ajuda || modais.erro || modais.sucesso" style="display: none;" x-transition.opacity></div>
+
+    <!-- Help Modal -->
+    <div class="modal help-modal" x-show="modais.ajuda" style="display: none;" x-transition>
         <div class="modal-glow"></div>
-        <h2>Primeiro Acesso</h2>
         
-        <form @submit.prevent="configurarPrimeiroAcesso">
-            <!-- New Password -->
-            <div class="input-group">
-                <span class="input-icon"><i class="fas fa-lock"></i></span>
-                <input :type="mostrarNovaSenha ? 'text' : 'password'" x-model="primeiroAcessoData.novaSenha" placeholder="Nova senha" required>
-                <button type="button" class="toggle-password" @click="mostrarNovaSenha = !mostrarNovaSenha">
-                    <i class="fas" :class="mostrarNovaSenha ? 'fa-eye-slash' : 'fa-eye'"></i>
-                </button>
+        <!-- Close Button -->
+        <button class="modal-close" @click="modais.ajuda = false">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div class="modal-header">
+            <i class="fas fa-rocket"></i>
+            <h2>Bem-vindo ao Wiki! 🚀</h2>
+        </div>
+        
+        <div class="modal-body">
+            <p class="welcome-message">
+                Olá, viajante do conhecimento! Estamos muito felizes em ter você aqui.
+            </p>
+
+            <div class="info-card">
+                <h3><i class="fas fa-key"></i> Suas Credenciais de Acesso</h3>
+                <p>Para entrar nesse universo, utilize as mesmas credenciais que você usa para acessar o Windows:</p>
+                
+                <div class="example-box">
+                    <div class="example-item">
+                        <span class="example-label">Usuário:</span>
+                        <code>gustavo.lasta</code>
+                    </div>
+                    <div class="example-item">
+                        <span class="example-label">Senha:</span>
+                        <code>gu12!@</code>
+                    </div>
+                </div>
+
+                <p class="example-note">
+                    <i class="fas fa-info-circle"></i>
+                    Substitua "gustavo.lasta" pelo seu usuário de rede
+                </p>
             </div>
-            
-            <!-- Confirm Password -->
-            <div class="input-group">
-                <span class="input-icon"><i class="fas fa-lock"></i></span>
-                <input :type="mostrarConfSenha ? 'text' : 'password'" x-model="primeiroAcessoData.confSenha" placeholder="Confirme a senha" required>
-                <button type="button" class="toggle-password" @click="mostrarConfSenha = !mostrarConfSenha">
-                    <i class="fas" :class="mostrarConfSenha ? 'fa-eye-slash' : 'fa-eye'"></i>
-                </button>
-            </div>
-            
-            <!-- Password Requirements -->
-            <div class="password-requirements">
-                <p>A senha deve conter:</p>
+
+            <div class="tips">
+                <h3><i class="fas fa-lightbulb"></i> Dicas Rápidas</h3>
                 <ul>
-                    <li>Mínimo 8 caracteres</li>
-                    <li>Pelo menos 1 número</li>
-                    <li>Pelo menos 1 caractere especial</li>
+                    <li><i class="fas fa-check-circle"></i> Mantenha sua senha em local seguro</li>
+                    <li><i class="fas fa-check-circle"></i> Explore todos os recursos disponíveis</li>
                 </ul>
             </div>
-            
-            <!-- Supervisor Select -->
-            <div class="input-group">
-                <span class="input-icon"><i class="fas fa-user-check"></i></span>
-                <select x-model="primeiroAcessoData.supervisor" required>
-                    <option value="" disabled selected>Selecione seu supervisor</option>
-                    <template x-for="sup in supervisores" :key="sup">
-                        <option :value="sup" x-text="sup"></option>
-                    </template>
-                </select>
-            </div>
-            
-            <!-- Buttons -->
-            <div class="modal-buttons">
-                <button type="button" class="modal-btn cancel" @click="modais.primeiroAcesso = false">Cancelar</button>
-                <button type="submit" class="modal-btn confirm">Salvar</button>
-            </div>
-        </form>
-    </div>
-    
-    <!-- Forgot Password Modal -->
-    <div class="modal forgot-password-popup" x-show="modais.esqueciSenha" style="display: none;" x-transition>
-        <div class="modal-glow"></div>
-        <h2>Redefinir Senha</h2>
-        
-        <form @submit.prevent="redefinirSenha">
-            <!-- Registration Number -->
-            <div class="input-group">
-                <span class="input-icon"><i class="fas fa-id-card"></i></span>
-                <input type="text" x-model="redefinirData.matricula" placeholder="Matrícula (Registro RH)" required>
-            </div>
-            
-            <!-- Wiki Login -->
-            <div class="input-group">
-                <span class="input-icon"><i class="fas fa-user"></i></span>
-                <input type="text" x-model="redefinirData.login" placeholder="Login Wiki (nome.sobrenome)" required>
-            </div>
-            
-            <!-- Supervisor -->
-            <div class="input-group">
-                <span class="input-icon"><i class="fas fa-user-check"></i></span>
-                <input type="text" x-model="redefinirData.supervisor" placeholder="Supervisor (nome.sobrenome)" required>
-            </div>
-            
-            <!-- Buttons -->
-            <div class="modal-buttons">
-                <button type="button" class="modal-btn cancel" @click="modais.esqueciSenha = false">Cancelar</button>
-                <button type="submit" class="modal-btn confirm">Redefinir</button>
-            </div>
-        </form>
-    </div>
-    
-    <!-- Error Modal -->
-    <div class="message-popup error" x-show="modais.erro" style="display: none;" x-transition>
-        <div class="popup-content">
-            <i class="fas fa-exclamation-circle"></i>
-            <p x-text="mensagemErro"></p>
-            <button @click="modais.erro = false">OK</button>
+        </div>
+
+        <div class="modal-footer">
+            <button class="modal-btn confirm" @click="modais.ajuda = false">
+                Entendi, vamos lá! <i class="fas fa-arrow-right"></i>
+            </button>
         </div>
     </div>
-    
-    <!-- Success Modal -->
-    <div class="message-popup success" x-show="modais.sucesso" style="display: none;" x-transition>
-        <div class="popup-content">
-            <i class="fas fa-check-circle"></i>
-            <p x-text="mensagemSucesso"></p>
-            <button @click="modais.sucesso = false">OK</button>
-        </div>
+
+    <div class="modal help-modal" x-show="modais.erro" style="display: none;" x-transition>
+        <div class="modal-header"><i class="fas fa-exclamation-triangle" style="color: #ff4d4d;"></i><h2 style="color: #ff4d4d;">Acesso Negado</h2></div>
+        <div class="modal-body text-center"><p class="welcome-message" x-text="mensagemServidor"></p></div>
+        <div class="modal-footer"><button class="modal-btn confirm" style="background: #ff4d4d;" @click="modais.erro = false">Tentar Novamente</button></div>
     </div>
-    
+
+    <div class="modal help-modal" x-show="modais.sucesso" style="display: none;" x-transition>
+        <div class="modal-header"><i class="fas fa-check-circle" style="color: #10b981;"></i><h2 style="color: #10b981;">Acesso Liberado!</h2></div>
+        <div class="modal-body text-center"><p class="welcome-message" x-text="mensagemServidor"></p><p><i class="fas fa-spinner fa-spin"></i> Autenticação concluída.</p></div>
+    </div>
+
     <script>
-        // Starfield Animation
         function initStarfield() {
             const canvas = document.getElementById('spaceCanvas');
             const ctx = canvas.getContext('2d');
-            
-            function resize() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            window.addEventListener('resize', resize);
-            resize();
-            
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
             class Star {
-                constructor() {
-                    this.x = Math.random() * canvas.width;
-                    this.y = Math.random() * canvas.height;
-                    this.size = Math.random() * 1.5;
-                    this.speed = Math.random() * 0.15;
-                    this.alpha = Math.random();
-                    this.flickerSpeed = Math.random() * 0.02;
-                }
-                
-                update() {
-                    this.y -= this.speed;
-                    if (this.y < 0) {
-                        this.y = canvas.height;
-                        this.x = Math.random() * canvas.width;
-                    }
-                    this.alpha += this.flickerSpeed;
-                    if (this.alpha > 0.8 || this.alpha < 0.1) this.flickerSpeed = -this.flickerSpeed;
-                }
-                
-                draw() {
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
-                    ctx.fill();
-                }
+                constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 1.5; this.speed = Math.random() * 0.15; this.alpha = Math.random(); this.flickerSpeed = Math.random() * 0.02; }
+                update() { this.y -= this.speed; if (this.y < 0) { this.y = canvas.height; this.x = Math.random() * canvas.width; } this.alpha += this.flickerSpeed; if (this.alpha > 0.8 || this.alpha < 0.1) this.flickerSpeed = -this.flickerSpeed; }
+                draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`; ctx.fill(); }
             }
-            
             const stars = Array.from({ length: 150 }, () => new Star());
-            
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                stars.forEach(star => {
-                    star.update();
-                    star.draw();
-                });
-                requestAnimationFrame(animate);
-            }
-            
+            function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); stars.forEach(star => { star.update(); star.draw(); }); requestAnimationFrame(animate); }
             animate();
+            window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
         }
-        
-        // Alpine.js App
+
         document.addEventListener('alpine:init', () => {
             initStarfield();
-            
             Alpine.data('wikiApp', () => ({
-                mostrarSenha: false,
-                mostrarNovaSenha: false,
-                mostrarConfSenha: false,
-                carregando: false,
-                
-                loginData: {
-                    username: '',
-                    password: ''
+                mostrarSenha: false, carregando: false, logoAnimando: false, konamiAtivado: false, mostrarMensagemKonami: false, konamiIndex: 0,
+                konamiCode: ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'],
+                loginData: { username: '', password: '' },
+                modais: { ajuda: false, erro: false, sucesso: false },
+                mensagemServidor: '',
+
+                init() {
+                    window.addEventListener('keydown', (e) => {
+                        if (this.konamiAtivado) return;
+                        const key = e.key.toLowerCase();
+                        if (e.key === this.konamiCode[this.konamiIndex] || key === this.konamiCode[this.konamiIndex]) {
+                            this.konamiIndex++;
+                            if (this.konamiIndex === this.konamiCode.length) { this.ativarKonami(); this.konamiIndex = 0; }
+                        } else { this.konamiIndex = 0; }
+                    });
                 },
                 
-                primeiroAcessoData: {
-                    novaSenha: '',
-                    confSenha: '',
-                    supervisor: ''
+                ativarKonami() { 
+                    this.konamiAtivado = true; 
+                    this.mostrarMensagemKonami = true; 
+                    
+                    // Pequeno "shake" de tela no momento da ativação
+                    document.body.style.animation = 'none';
+                    setTimeout(() => {
+                        document.body.style.animation = 'retroReboot 0.8s ease-out';
+                    }, 10);
+
+                    // Esconde a mensagem após 4 segundos
+                    setTimeout(() => this.mostrarMensagemKonami = false, 4000); 
+
+                    // Opcional: Ajustar o canvas para parecer mais "quadrado"
+                    const canvas = document.getElementById('spaceCanvas');
+                    if(canvas) {
+                        canvas.style.filter = 'contrast(2) brightness(1.5)';
+                    }
                 },
-                
-                redefinirData: {
-                    matricula: '',
-                    login: '',
-                    supervisor: ''
+
+                animarLogo() {
+                    if(this.logoAnimando) return;
+                    this.logoAnimando = true;
+                    setTimeout(() => this.logoAnimando = false, 500);
                 },
-                
-                modais: {
-                    primeiroAcesso: false,
-                    esqueciSenha: false,
-                    erro: false,
-                    sucesso: false
+
+                iniciarLoadingE_Redirecionar(urlDestino) {
+                    const loader = document.getElementById('loading-screen');
+                    const loadingText = document.getElementById('loading-percentage');
+                    let loadingPercentage = 0;
+
+                    // Esconde o modal de sucesso e mostra o loading
+                    this.modais.sucesso = false;
+                    loader.style.display = 'flex';
+                    // Força a renderização do display flex antes da opacidade
+                    void loader.offsetWidth;
+                    loader.style.opacity = '1';
+
+                    const interval = setInterval(() => {
+                        loadingPercentage += Math.floor(Math.random() * 15) + 5;
+                        if(loadingPercentage >= 100) {
+                            loadingPercentage = 100;
+                            clearInterval(interval);
+                            
+                            // Aguarda um instante em 100% e redireciona
+                            setTimeout(() => {
+                                window.location.href = urlDestino;
+                            }, 300);
+                        }
+                        loadingText.textContent = loadingPercentage + '%';
+                    }, 100);
                 },
-                
-                mensagemErro: '',
-                mensagemSucesso: '',
-                
-                supervisores: [
-                    'Ana Silva',
-                    'Carlos Santos',
-                    'Mariana Oliveira',
-                    'João Pereira',
-                    'Patrícia Lima'
-                ],
-                
+
                 async fazerLogin() {
                     this.carregando = true;
+                    this.modais.erro = false;
                     
-                    // Simulação de login
-                    setTimeout(() => {
-                        this.carregando = false;
+                    try {
+                        const response = await fetch('/api/auth/login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(this.loginData)
+                        });
                         
-                        // Exemplo: verificar se é primeiro acesso
-                        if (this.loginData.username === 'primeiro.acesso') {
-                            this.modais.primeiroAcesso = true;
-                        } else if (this.loginData.username === 'erro') {
-                            this.mostrarErro('Usuário ou senha incorretos.');
+                        const data = await response.json();
+                        
+                        if(data.success) {
+                            this.mensagemServidor = data.message;
+                            this.modais.sucesso = true;
+                            
+                            // Aguarda o usuário ler a mensagem de sucesso e chama a transição
+                            setTimeout(() => { 
+                                this.iniciarLoadingE_Redirecionar(data.redirect);
+                            }, 1500);
                         } else {
-                            this.mostrarSucesso('Login realizado com sucesso!');
+                            this.mensagemServidor = data.message;
+                            this.modais.erro = true;
                         }
-                    }, 1500);
-                },
-                
-                configurarPrimeiroAcesso() {
-                    // Validar senhas
-                    if (this.primeiroAcessoData.novaSenha !== this.primeiroAcessoData.confSenha) {
-                        this.mostrarErro('As senhas não coincidem.');
-                        return;
+                    } catch (error) {
+                        this.mensagemServidor = "Erro de conexão com o servidor Node.";
+                        this.modais.erro = true;
+                    } finally {
+                        this.carregando = false;
                     }
-                    
-                    // Validar requisitos da senha
-                    const senha = this.primeiroAcessoData.novaSenha;
-                    if (senha.length < 8 || !/\d/.test(senha) || !/[!@#$%^&*]/.test(senha)) {
-                        this.mostrarErro('A senha não atende aos requisitos.');
-                        return;
-                    }
-                    
-                    this.modais.primeiroAcesso = false;
-                    this.mostrarSucesso('Senha configurada com sucesso!');
-                },
-                
-                redefinirSenha() {
-                    this.modais.esqueciSenha = false;
-                    this.mostrarSucesso('Instruções de redefinição enviadas para seu email.');
-                },
-                
-                mostrarErro(msg) {
-                    this.mensagemErro = msg;
-                    this.modais.erro = true;
-                },
-                
-                mostrarSucesso(msg) {
-                    this.mensagemSucesso = msg;
-                    this.modais.sucesso = true;
                 }
             }));
         });

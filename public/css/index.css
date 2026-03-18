@@ -12,6 +12,8 @@
     --glass-bg: rgba(10, 10, 22, 0.8);
     --border-light: rgba(255, 255, 255, 0.05);
     --input-bg: rgba(255, 255, 255, 0.05);
+    --pixel-border: #000000;
+    --pixel-bg: #0a0a0a;
 }
 
 * {
@@ -26,16 +28,201 @@ body {
     color: var(--text-light);
     overflow: hidden;
     user-select: none;
+    transition: filter 0.5s ease;
 }
 
-/* Split Screen Layout */
+/* =========================================================
+   8-BIT / KONAMI MODE (MELHORADO)
+========================================================= */
+
+/* Efeito de Scanlines (Linhas de TV) */
+.scanlines {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 4px, 3px 100%;
+    pointer-events: none;
+    z-index: 10000;
+}
+
+/* Animação de Transição (Flash/Glitch) */
+@keyframes retroReboot {
+    0% { filter: brightness(5) contrast(2); transform: scale(1); }
+    10% { transform: scale(1.02) skewX(10deg); background: #fff; }
+    20% { transform: scale(1) skewX(0); }
+    100% { filter: brightness(1) contrast(1.2); }
+}
+
+body.mode-8bit {
+    background-color: #000 !important;
+}
+
+/* Estilo Geral 8-bit */
+body.mode-8bit * {
+    font-family: 'Press Start 2P', cursive !important;
+    text-transform: uppercase;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    letter-spacing: -1px;
+    image-rendering: pixelated;
+}
+
+/* Bordas Pixeladas (Double Border Style) */
+body.mode-8bit .login-section,
+body.mode-8bit .input-group input,
+body.mode-8bit .login-btn,
+body.mode-8bit .modal,
+body.mode-8bit .help-btn {
+    border: 4px solid #fff !important;
+    outline: 4px solid #000 !important;
+    background: #000 !important;
+    box-shadow: 8px 8px 0px #555 !important;
+}
+
+/* Planeta e Espaço 8-bit */
+body.mode-8bit .space-scene {
+    background: #000 !important;
+}
+
+body.mode-8bit .planet {
+    background: #5555ff !important; /* Cor sólida NES */
+    border: 8px solid #fff !important;
+}
+
+body.mode-8bit .planet-atmosphere, 
+body.mode-8bit .planet-glow,
+body.mode-8bit .orbit-path {
+    display: none; /* Remove efeitos modernos de blur */
+}
+
+body.mode-8bit .moon {
+    border: 4px solid #fff !important;
+}
+
+/* Botão e Input no modo 8-bit */
+body.mode-8bit .login-btn:hover {
+    background: #fff !important;
+    color: #000 !important;
+    transform: translate(4px, 4px);
+    box-shadow: 4px 4px 0px #555 !important;
+}
+
+body.mode-8bit .input-group input {
+    color: #0f0 !important; /* Verde terminal */
+}
+
+/* Mensagem Konami Centralizada */
+.eightbit-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #000;
+    color: #ffff00;
+    padding: 30px;
+    border: 6px double #fff;
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    text-align: center;
+    box-shadow: 0 0 0 1000px rgba(0,0,0,0.8); /* Escurece o fundo */
+}
+
+@keyframes typewriting {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+.anim-typewriter {
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typewriting 0.5s steps(20, end);
+}
+
+/* =========================================================
+   LOADING SCREEN MODERNO
+========================================================= */
+.loading-container {
+    position: fixed; 
+    inset: 0; 
+    background: var(--space-blue); 
+    z-index: 9999; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    transition: opacity 0.5s ease; 
+}
+
+.planet-container { 
+    position: relative; 
+    width: 100px; 
+    height: 100px; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.planet-loader {
+    width: 80px; 
+    height: 80px; 
+    border-radius: 50%; 
+    background: linear-gradient(135deg, var(--accent-blue), var(--planet-purple)); 
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.5); 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    font-weight: bold; 
+    font-size: 14px; 
+    animation: pulse 2s infinite; 
+    z-index: 2; 
+}
+
+.planet-ring-loader {
+    position: absolute; 
+    width: 140px; 
+    height: 140px; 
+    border-radius: 50%; 
+    border: 4px solid rgba(59, 130, 246, 0.3); 
+    border-top-color: var(--accent-blue); 
+    animation: spin 1.5s linear infinite; 
+    z-index: 1; 
+}
+
+.moon-loader {
+    position: absolute; 
+    top: -10px; 
+    left: -10px; 
+    width: 20px; 
+    height: 20px; 
+    background: white; 
+    border-radius: 50%; 
+    box-shadow: 0 0 10px white; 
+    animation: orbit-load 2s linear infinite; 
+    z-index: 3; 
+}
+
+@keyframes pulse { 
+    0%, 100% { transform: scale(1); } 
+    50% { transform: scale(1.05); } 
+}
+
+@keyframes orbit-load { 
+    from { transform: rotate(0deg) translateX(70px) rotate(0deg); } 
+    to { transform: rotate(360deg) translateX(70px) rotate(-360deg); } 
+}
+
+/* =========================================================
+   SPLIT SCREEN & SPACE SCENE (ESQUERDA)
+========================================================= */
 .split-screen {
     display: flex;
     height: 100vh;
     width: 100%;
 }
 
-/* Left Side - Space Scene */
 .space-scene {
     flex: 1;
     position: relative;
@@ -58,7 +245,6 @@ body {
     z-index: 0;
 }
 
-/* Comet Animation */
 .comet {
     position: absolute;
     width: 150px;
@@ -91,7 +277,6 @@ body {
     100% { left: 110%; top: 80%; opacity: 0; transform: rotate(20deg) scale(0.5); }
 }
 
-/* Planet System */
 .planet-system-container {
     position: relative;
     width: 100%;
@@ -172,16 +357,8 @@ body {
     animation: rotate linear infinite;
 }
 
-.moon-orbit-1 {
-    animation-duration: 20s;
-}
-
-.moon-orbit-2 {
-    width: 110%;
-    height: 110%;
-    animation-duration: 35s;
-    animation-direction: reverse;
-}
+.moon-orbit-1 { animation-duration: 20s; }
+.moon-orbit-2 { width: 110%; height: 110%; animation-duration: 35s; animation-direction: reverse; }
 
 @keyframes rotate {
     from { transform: rotate(0deg); }
@@ -214,7 +391,6 @@ body {
     box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
 }
 
-/* Space Message */
 .space-message {
     position: absolute;
     bottom: 96px;
@@ -226,14 +402,8 @@ body {
 }
 
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translate(-50%, 20px);
-    }
-    to {
-        opacity: 1;
-        transform: translate(-50%, 0);
-    }
+    from { opacity: 0; transform: translate(-50%, 20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
 }
 
 .space-message h2 {
@@ -268,7 +438,9 @@ body {
     50% { border-color: var(--accent-blue); }
 }
 
-/* Right Side - Login Section */
+/* =========================================================
+   LOGIN SECTION (DIREITA)
+========================================================= */
 .login-section {
     width: 480px;
     background: var(--glass-bg);
@@ -283,12 +455,8 @@ body {
 }
 
 @keyframes slideIn {
-    from {
-        transform: translateX(100%);
-    }
-    to {
-        transform: translateX(0);
-    }
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
 }
 
 .login-container {
@@ -300,23 +468,36 @@ body {
 .logo-wrapper {
     display: flex;
     justify-content: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 10px;
 }
 
-.logo-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: 1rem;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
-    border: 1px solid var(--border-light);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.logo-image {
+    width: 75%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.2s ease-out;
+    cursor: pointer;
 }
 
-.logo-icon i {
-    font-size: 2.5rem;
-    color: #60a5fa;
+.logo-image:hover {
+    animation: floatLogo 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.5));
+}
+
+@keyframes floatLogo {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-5px) rotate(-2deg); }
+    75% { transform: translateY(-3px) rotate(2deg); }
+}
+
+.pop-anim-active {
+    animation: popLogoClick 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+}
+
+@keyframes popLogoClick {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.2); filter: brightness(1.3) drop-shadow(0 0 20px rgba(59, 130, 246, 0.8)); }
+    100% { transform: scale(1); }
 }
 
 .login-section h1 {
@@ -334,14 +515,12 @@ body {
     margin-bottom: 2rem;
 }
 
-/* Form Elements */
 .input-group {
     position: relative;
     margin-bottom: 1rem;
 }
 
-.input-group input,
-.input-group select {
+.input-group input {
     width: 100%;
     padding: 0.875rem 0.875rem 0.875rem 2.75rem;
     background: var(--input-bg);
@@ -352,15 +531,13 @@ body {
     transition: all 0.3s;
 }
 
-.input-group input:focus,
-.input-group select:focus {
+.input-group input:focus {
     outline: none;
     border-color: rgba(59, 130, 246, 0.5);
     background: rgba(255, 255, 255, 0.1);
 }
 
-.input-group input::placeholder,
-.input-group select {
+.input-group input::placeholder {
     color: var(--text-dim);
 }
 
@@ -397,31 +574,42 @@ body {
     color: var(--text-light);
 }
 
-/* Login Links */
-.login-links {
+.action-container {
     display: flex;
-    justify-content: space-between;
+    gap: 0.75rem;
     align-items: center;
-    margin: 1rem 0;
-    font-size: 0.875rem;
+    margin-top: 1rem;
 }
 
-.link-btn {
-    background: none;
-    border: none;
+.help-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--input-bg);
+    border: 1px solid var(--border-light);
     color: var(--text-dim);
     cursor: pointer;
-    transition: color 0.3s;
-    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
 }
 
-.link-btn:hover {
-    color: var(--accent-blue);
+.help-btn:hover {
+    background: var(--accent-blue);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
 }
 
-/* Login Button */
+.help-btn:active {
+    transform: scale(0.95);
+}
+
 .login-btn {
-    width: 100%;
+    flex: 1;
     padding: 0.875rem;
     background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
     border: none;
@@ -463,48 +651,74 @@ body {
     to { transform: rotate(360deg); }
 }
 
-/* Footer */
+/* =========================================================
+   FOOTER COM EASTER EGG
+========================================================= */
 .trc-footer {
-    margin-top: 4rem;
+    margin-top: 25px;
     text-align: center;
+    position: relative;
 }
 
-.footer-text {
-    color: var(--text-dim);
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    transition: color 0.3s;
-}
-
-.trc-footer a {
+.footer-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 200px;
+    height: 70px;
     text-decoration: none;
 }
 
-.trc-footer a:hover .footer-text {
-    color: var(--text-light);
+.footer-logo {
+    position: absolute;
+    height: 70px;
+    width: auto;
+    opacity: 0.7;
+    transition: opacity 0.3s ease; 
 }
 
-/* Modal Overlay */
+.easter-egg {
+    position: absolute;
+    opacity: 0;
+    color: var(--accent-blue);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    white-space: nowrap;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.footer-link:hover .footer-logo {
+    opacity: 0;
+    transition-delay: 1.5s;
+}
+
+.footer-link:hover .easter-egg {
+    opacity: 1;
+    transition-delay: 1.5s;
+}
+
+/* =========================================================
+   MODAIS E OVERLAYS
+========================================================= */
 .popup-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(5px);
     z-index: 100;
 }
 
-/* Modals */
 .modal {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 90%;
-    max-width: 448px;
+    max-width: 500px;
     background: #0f0f1a;
     border: 1px solid var(--border-light);
     border-radius: 1rem;
@@ -512,6 +726,10 @@ body {
     z-index: 101;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     overflow: hidden;
+}
+
+.help-modal {
+    max-width: 520px;
 }
 
 .modal-glow {
@@ -526,156 +744,201 @@ body {
     pointer-events: none;
 }
 
-.modal h2 {
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--text-dim);
     font-size: 1.25rem;
-    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.3s;
+    z-index: 2;
+}
+
+.modal-close:hover {
+    color: var(--text-light);
+}
+
+.modal-header {
+    text-align: center;
     margin-bottom: 1.5rem;
     position: relative;
     z-index: 1;
 }
 
-/* Password Requirements */
-.password-requirements {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border-light);
-    border-radius: 0.5rem;
-    padding: 0.75rem 1rem;
-    margin: 1rem 0;
-    font-size: 0.75rem;
+.modal-header i {
+    font-size: 2.5rem;
+    color: var(--accent-blue);
+    margin-bottom: 0.5rem;
 }
 
-.password-requirements p {
-    color: #9ca3af;
-    margin-bottom: 0.25rem;
+.modal-header h2 {
+    font-size: 1.5rem;
+    font-weight: 500;
 }
 
-.password-requirements ul {
-    padding-left: 1.5rem;
+.modal-body {
+    position: relative;
+    z-index: 1;
+}
+
+.welcome-message {
     color: var(--text-dim);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
 }
 
-/* Modal Buttons */
-.modal-buttons {
+.info-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-light);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-card h3 {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: var(--accent-blue);
     display: flex;
-    gap: 0.75rem;
-    margin-top: 2rem;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.example-box {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 0.75rem;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.example-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+}
+
+.example-item:first-child {
+    border-bottom: 1px solid var(--border-light);
+}
+
+.example-label {
+    color: var(--text-dim);
+    min-width: 60px;
+    font-size: 0.875rem;
+}
+
+.example-item code {
+    background: var(--input-bg);
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.5rem;
+    color: var(--accent-blue);
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
+.example-note {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tips {
+    margin-bottom: 1.5rem;
+}
+
+.tips h3 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    color: var(--accent-purple);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tips ul {
+    list-style: none;
+    padding: 0;
+}
+
+.tips li {
+    color: var(--text-dim);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tips li i {
+    color: #10b981;
+}
+
+.modal-footer {
+    margin-top: 1.5rem;
+    position: relative;
+    z-index: 1;
 }
 
 .modal-btn {
-    flex: 1;
-    padding: 0.75rem;
+    width: 100%;
+    padding: 0.875rem;
     border-radius: 0.75rem;
-    font-size: 0.875rem;
+    font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s;
     border: none;
 }
 
-.modal-btn.cancel {
-    background: transparent;
-    border: 1px solid var(--border-light);
-    color: var(--text-light);
-}
-
-.modal-btn.cancel:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
 .modal-btn.confirm {
-    background: var(--accent-blue);
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
     color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 .modal-btn.confirm:hover {
-    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
 }
 
-/* Message Popups */
-.message-popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 102;
-    min-width: 300px;
+.modal-btn.confirm:active {
+    transform: translateY(0);
 }
 
-.popup-content {
-    background: #0f0f1a;
-    border: 1px solid var(--border-light);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    text-align: center;
-}
-
-.popup-content i {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-}
-
-.message-popup.error .popup-content i {
-    color: #ef4444;
-}
-
-.message-popup.success .popup-content i {
-    color: #10b981;
-}
-
-.popup-content p {
-    margin-bottom: 1.5rem;
-}
-
-.popup-content button {
-    padding: 0.5rem 2rem;
-    background: transparent;
-    border: 1px solid var(--border-light);
-    border-radius: 0.5rem;
-    color: var(--text-light);
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.popup-content button:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-/* Select Styles */
-select {
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 1rem center;
-    background-size: 1rem;
-}
-
-select option {
-    background-color: #0f0f1a;
-    color: var(--text-light);
-}
-
-/* Responsive Design */
+/* =========================================================
+   RESPONSIVIDADE
+========================================================= */
 @media (max-width: 1024px) {
     .split-screen {
         flex-direction: column;
     }
-    
+
     .space-scene {
         height: 30vh;
         min-height: 200px;
     }
-    
+
     .login-section {
         width: 100%;
         height: 70vh;
         border-left: none;
         border-top: 1px solid var(--border-light);
     }
-    
+
     .planet-system {
         transform: scale(0.5);
     }
-    
+
     .space-message {
         display: none;
     }
@@ -685,21 +948,29 @@ select option {
     .login-section {
         padding: 2rem 1rem;
     }
-    
+
     .planet-system {
         transform: scale(0.4);
     }
-    
+
+    .footer-logo {
+        height: 25px;
+    }
+
     .modal {
         padding: 1.5rem;
+        width: 95%;
     }
-    
-    .modal-buttons {
-        flex-direction: column;
+
+    .eightbit-message {
+        font-size: 0.5rem;
+        padding: 5px 10px;
     }
 }
 
-/* Alpine.js Transitions */
+/* =========================================================
+   TRANSICOES ALPINE.JS
+========================================================= */
 [x-cloak] {
     display: none !important;
 }
