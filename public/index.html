@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Gustavo Luigi Lasta">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiki | Conhecimento em suas mãos</title>
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="icon" type="image/png" href="/assets/logos/Logotipo_WikiTRC.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body x-data="wikiApp()">
+    <div class="split-screen">
+        <!-- Left Side - Space Scene -->
+        <div class="space-scene">
+            <canvas id="spaceCanvas"></canvas>
+            
+            <!-- Comet -->
+            <div class="comet"></div>
+            
+            <!-- Planet System -->
+            <div class="planet-system-container">
+                <div class="planet-system">
+                    <!-- Glow behind planet -->
+                    <div class="planet-glow"></div>
+                    
+                    <!-- Planet -->
+                    <div class="planet-wrapper">
+                        <div class="planet">
+                            <div class="planet-atmosphere"></div>
+                            <div class="planet-ring"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Orbit Path -->
+                    <div class="orbit-path"></div>
+                    
+                    <!-- Moon 1 (Orbit) -->
+                    <div class="moon-orbit moon-orbit-1">
+                        <div class="moon moon-1"></div>
+                    </div>
+                    
+                    <!-- Moon 2 (Smaller Orbit) -->
+                    <div class="moon-orbit moon-orbit-2">
+                        <div class="moon moon-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Space Message -->
+            <div class="space-message">
+                <h2>EXPLORE O CONHECIMENTO</h2>
+                <p class="typing-effect">Acesse o Wiki e descubra um universo de informações</p>
+            </div>
+        </div>
+        
+        <!-- Right Side - Login Panel -->
+        <div class="login-section">
+            <div class="login-container">
+                <!-- Logo / Rocket Icon -->
+                <div class="logo-wrapper">
+                    <div class="logo-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                </div>
+                
+                <h1>Seja Bem-Vindo</h1>
+                <p class="login-subtitle">Insira suas credenciais para acessar</p>
+                
+                <form class="form-login" @submit.prevent="fazerLogin">
+                    <!-- Username Input -->
+                    <div class="input-group">
+                        <span class="input-icon"><i class="fas fa-user"></i></span>
+                        <input type="text" x-model="loginData.username" placeholder="Login Wiki ou Matrícula" required>
+                    </div>
+                    
+                    <!-- Password Input -->
+                    <div class="input-group">
+                        <span class="input-icon"><i class="fas fa-lock"></i></span>
+                        <input :type="mostrarSenha ? 'text' : 'password'" x-model="loginData.password" placeholder="Senha Wiki" required>
+                        <button type="button" class="toggle-password" @click="mostrarSenha = !mostrarSenha">
+                            <i class="fas" :class="mostrarSenha ? 'fa-eye-slash' : 'fa-eye'"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Links -->
+                    <div class="login-links">
+                        <button type="button" class="link-btn" @click="modais.esqueciSenha = true">Esqueceu a senha?</button>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" class="login-btn" :disabled="carregando">
+                        <span x-show="!carregando">Acessar Órbita</span>
+                        <span x-show="carregando">
+                            <i class="fas fa-spinner fa-spin"></i> Conectando...
+                        </span>
+                    </button>
+                </form>
+                
+                <!-- Footer -->
+                <div class="trc-footer">
+                    <a href="https://trctaborda.com.br/" target="_blank">
+                        <span class="footer-text">Powered by TRC Taborda</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Overlay -->
+    <div class="popup-overlay" x-show="modais.primeiroAcesso || modais.esqueciSenha" style="display: none;" x-transition.opacity></div>
+    
+    <!-- First Access Modal -->
+    <div class="modal first-login-popup" x-show="modais.primeiroAcesso" style="display: none;" x-transition>
+        <div class="modal-glow"></div>
+        <h2>Primeiro Acesso</h2>
+        
+        <form @submit.prevent="configurarPrimeiroAcesso">
+            <!-- New Password -->
+            <div class="input-group">
+                <span class="input-icon"><i class="fas fa-lock"></i></span>
+                <input :type="mostrarNovaSenha ? 'text' : 'password'" x-model="primeiroAcessoData.novaSenha" placeholder="Nova senha" required>
+                <button type="button" class="toggle-password" @click="mostrarNovaSenha = !mostrarNovaSenha">
+                    <i class="fas" :class="mostrarNovaSenha ? 'fa-eye-slash' : 'fa-eye'"></i>
+                </button>
+            </div>
+            
+            <!-- Confirm Password -->
+            <div class="input-group">
+                <span class="input-icon"><i class="fas fa-lock"></i></span>
+                <input :type="mostrarConfSenha ? 'text' : 'password'" x-model="primeiroAcessoData.confSenha" placeholder="Confirme a senha" required>
+                <button type="button" class="toggle-password" @click="mostrarConfSenha = !mostrarConfSenha">
+                    <i class="fas" :class="mostrarConfSenha ? 'fa-eye-slash' : 'fa-eye'"></i>
+                </button>
+            </div>
+            
+            <!-- Password Requirements -->
+            <div class="password-requirements">
+                <p>A senha deve conter:</p>
+                <ul>
+                    <li>Mínimo 8 caracteres</li>
+                    <li>Pelo menos 1 número</li>
+                    <li>Pelo menos 1 caractere especial</li>
+                </ul>
+            </div>
+            
+            <!-- Supervisor Select -->
+            <div class="input-group">
+                <span class="input-icon"><i class="fas fa-user-check"></i></span>
+                <select x-model="primeiroAcessoData.supervisor" required>
+                    <option value="" disabled selected>Selecione seu supervisor</option>
+                    <template x-for="sup in supervisores" :key="sup">
+                        <option :value="sup" x-text="sup"></option>
+                    </template>
+                </select>
+            </div>
+            
+            <!-- Buttons -->
+            <div class="modal-buttons">
+                <button type="button" class="modal-btn cancel" @click="modais.primeiroAcesso = false">Cancelar</button>
+                <button type="submit" class="modal-btn confirm">Salvar</button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Forgot Password Modal -->
+    <div class="modal forgot-password-popup" x-show="modais.esqueciSenha" style="display: none;" x-transition>
+        <div class="modal-glow"></div>
+        <h2>Redefinir Senha</h2>
+        
+        <form @submit.prevent="redefinirSenha">
+            <!-- Registration Number -->
+            <div class="input-group">
+                <span class="input-icon"><i class="fas fa-id-card"></i></span>
+                <input type="text" x-model="redefinirData.matricula" placeholder="Matrícula (Registro RH)" required>
+            </div>
+            
+            <!-- Wiki Login -->
+            <div class="input-group">
+                <span class="input-icon"><i class="fas fa-user"></i></span>
+                <input type="text" x-model="redefinirData.login" placeholder="Login Wiki (nome.sobrenome)" required>
+            </div>
+            
+            <!-- Supervisor -->
+            <div class="input-group">
+                <span class="input-icon"><i class="fas fa-user-check"></i></span>
+                <input type="text" x-model="redefinirData.supervisor" placeholder="Supervisor (nome.sobrenome)" required>
+            </div>
+            
+            <!-- Buttons -->
+            <div class="modal-buttons">
+                <button type="button" class="modal-btn cancel" @click="modais.esqueciSenha = false">Cancelar</button>
+                <button type="submit" class="modal-btn confirm">Redefinir</button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Error Modal -->
+    <div class="message-popup error" x-show="modais.erro" style="display: none;" x-transition>
+        <div class="popup-content">
+            <i class="fas fa-exclamation-circle"></i>
+            <p x-text="mensagemErro"></p>
+            <button @click="modais.erro = false">OK</button>
+        </div>
+    </div>
+    
+    <!-- Success Modal -->
+    <div class="message-popup success" x-show="modais.sucesso" style="display: none;" x-transition>
+        <div class="popup-content">
+            <i class="fas fa-check-circle"></i>
+            <p x-text="mensagemSucesso"></p>
+            <button @click="modais.sucesso = false">OK</button>
+        </div>
+    </div>
+    
+    <script>
+        // Starfield Animation
+        function initStarfield() {
+            const canvas = document.getElementById('spaceCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+            
+            class Star {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 1.5;
+                    this.speed = Math.random() * 0.15;
+                    this.alpha = Math.random();
+                    this.flickerSpeed = Math.random() * 0.02;
+                }
+                
+                update() {
+                    this.y -= this.speed;
+                    if (this.y < 0) {
+                        this.y = canvas.height;
+                        this.x = Math.random() * canvas.width;
+                    }
+                    this.alpha += this.flickerSpeed;
+                    if (this.alpha > 0.8 || this.alpha < 0.1) this.flickerSpeed = -this.flickerSpeed;
+                }
+                
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+                    ctx.fill();
+                }
+            }
+            
+            const stars = Array.from({ length: 150 }, () => new Star());
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                stars.forEach(star => {
+                    star.update();
+                    star.draw();
+                });
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+        }
+        
+        // Alpine.js App
+        document.addEventListener('alpine:init', () => {
+            initStarfield();
+            
+            Alpine.data('wikiApp', () => ({
+                mostrarSenha: false,
+                mostrarNovaSenha: false,
+                mostrarConfSenha: false,
+                carregando: false,
+                
+                loginData: {
+                    username: '',
+                    password: ''
+                },
+                
+                primeiroAcessoData: {
+                    novaSenha: '',
+                    confSenha: '',
+                    supervisor: ''
+                },
+                
+                redefinirData: {
+                    matricula: '',
+                    login: '',
+                    supervisor: ''
+                },
+                
+                modais: {
+                    primeiroAcesso: false,
+                    esqueciSenha: false,
+                    erro: false,
+                    sucesso: false
+                },
+                
+                mensagemErro: '',
+                mensagemSucesso: '',
+                
+                supervisores: [
+                    'Ana Silva',
+                    'Carlos Santos',
+                    'Mariana Oliveira',
+                    'João Pereira',
+                    'Patrícia Lima'
+                ],
+                
+                async fazerLogin() {
+                    this.carregando = true;
+                    
+                    // Simulação de login
+                    setTimeout(() => {
+                        this.carregando = false;
+                        
+                        // Exemplo: verificar se é primeiro acesso
+                        if (this.loginData.username === 'primeiro.acesso') {
+                            this.modais.primeiroAcesso = true;
+                        } else if (this.loginData.username === 'erro') {
+                            this.mostrarErro('Usuário ou senha incorretos.');
+                        } else {
+                            this.mostrarSucesso('Login realizado com sucesso!');
+                        }
+                    }, 1500);
+                },
+                
+                configurarPrimeiroAcesso() {
+                    // Validar senhas
+                    if (this.primeiroAcessoData.novaSenha !== this.primeiroAcessoData.confSenha) {
+                        this.mostrarErro('As senhas não coincidem.');
+                        return;
+                    }
+                    
+                    // Validar requisitos da senha
+                    const senha = this.primeiroAcessoData.novaSenha;
+                    if (senha.length < 8 || !/\d/.test(senha) || !/[!@#$%^&*]/.test(senha)) {
+                        this.mostrarErro('A senha não atende aos requisitos.');
+                        return;
+                    }
+                    
+                    this.modais.primeiroAcesso = false;
+                    this.mostrarSucesso('Senha configurada com sucesso!');
+                },
+                
+                redefinirSenha() {
+                    this.modais.esqueciSenha = false;
+                    this.mostrarSucesso('Instruções de redefinição enviadas para seu email.');
+                },
+                
+                mostrarErro(msg) {
+                    this.mensagemErro = msg;
+                    this.modais.erro = true;
+                },
+                
+                mostrarSucesso(msg) {
+                    this.mensagemSucesso = msg;
+                    this.modais.sucesso = true;
+                }
+            }));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,713 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap');
+
+:root {
+    --space-blue: #030308;
+    --planet-purple: #2a1b54;
+    --planet-dark: #0f0a24;
+    --moon-gray: #d0d0e0;
+    --accent-blue: #3b82f6;
+    --accent-purple: #9333ea;
+    --text-light: #ffffff;
+    --text-dim: #9ca3af;
+    --glass-bg: rgba(10, 10, 22, 0.8);
+    --border-light: rgba(255, 255, 255, 0.05);
+    --input-bg: rgba(255, 255, 255, 0.05);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Space Grotesk', sans-serif;
+    background-color: var(--space-blue);
+    color: var(--text-light);
+    overflow: hidden;
+    user-select: none;
+}
+
+/* Split Screen Layout */
+.split-screen {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+/* Left Side - Space Scene */
+.space-scene {
+    flex: 1;
+    position: relative;
+    background: linear-gradient(135deg, #030308, #0f0a1a);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#spaceCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.6;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Comet Animation */
+.comet {
+    position: absolute;
+    width: 150px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    top: 25%;
+    left: -10%;
+    transform: rotate(20deg);
+    opacity: 0;
+    animation: comet 12s linear infinite;
+    z-index: 1;
+}
+
+.comet::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -4px;
+    width: 10px;
+    height: 10px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 0 15px white;
+}
+
+@keyframes comet {
+    0% { left: -10%; top: 10%; opacity: 0; transform: rotate(20deg) scale(0.5); }
+    10% { opacity: 1; transform: rotate(20deg) scale(1); }
+    20% { opacity: 0; transform: rotate(20deg) scale(0.5); }
+    100% { left: 110%; top: 80%; opacity: 0; transform: rotate(20deg) scale(0.5); }
+}
+
+/* Planet System */
+.planet-system-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.planet-system {
+    position: relative;
+    width: 384px;
+    height: 384px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.planet-glow {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(59, 130, 246, 0.1);
+    filter: blur(100px);
+}
+
+.planet-wrapper {
+    animation: float 10s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(2deg); }
+}
+
+.planet {
+    position: relative;
+    width: 256px;
+    height: 256px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--planet-purple), var(--planet-dark));
+    box-shadow: inset -20px -20px 40px rgba(0, 0, 0, 0.5), 0 0 40px rgba(74, 44, 138, 0.3);
+    overflow: hidden;
+}
+
+.planet-atmosphere {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 30%, rgba(100, 180, 255, 0.4), transparent 60%);
+    opacity: 0.5;
+}
+
+.planet-ring {
+    position: absolute;
+    top: 25%;
+    left: 25%;
+    width: 100%;
+    height: 100%;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    transform: rotate(-45deg);
+}
+
+.orbit-path {
+    position: absolute;
+    width: 140%;
+    height: 140%;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    transform: rotate(12deg);
+}
+
+.moon-orbit {
+    position: absolute;
+    width: 140%;
+    height: 140%;
+    animation: rotate linear infinite;
+}
+
+.moon-orbit-1 {
+    animation-duration: 20s;
+}
+
+.moon-orbit-2 {
+    width: 110%;
+    height: 110%;
+    animation-duration: 35s;
+    animation-direction: reverse;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.moon {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+}
+
+.moon-1 {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(to bottom right, #e5e7eb, #6b7280);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+}
+
+.moon-2 {
+    width: 16px;
+    height: 16px;
+    bottom: 0;
+    top: auto;
+    right: 25%;
+    left: auto;
+    background: linear-gradient(to bottom right, #bfdbfe, #3b82f6);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+}
+
+/* Space Message */
+.space-message {
+    position: absolute;
+    bottom: 96px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 3;
+    animation: fadeInUp 1s ease-out 0.5s both;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 20px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.space-message h2 {
+    font-size: 2.5rem;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #60a5fa, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.typing-effect {
+    color: rgba(191, 219, 254, 0.6);
+    font-size: 1.125rem;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    border-right: 2px solid var(--accent-blue);
+    white-space: nowrap;
+    overflow: hidden;
+    animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent; }
+    50% { border-color: var(--accent-blue); }
+}
+
+/* Right Side - Login Section */
+.login-section {
+    width: 480px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border-left: 1px solid var(--border-light);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 3rem 2rem;
+    z-index: 10;
+    animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+.login-container {
+    max-width: 384px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.logo-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.logo-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 1rem;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+    border: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-icon i {
+    font-size: 2.5rem;
+    color: #60a5fa;
+}
+
+.login-section h1 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.login-subtitle {
+    color: var(--text-dim);
+    font-size: 0.875rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+/* Form Elements */
+.input-group {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 0.875rem 0.875rem 0.875rem 2.75rem;
+    background: var(--input-bg);
+    border: 1px solid var(--border-light);
+    border-radius: 0.75rem;
+    color: var(--text-light);
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: rgba(59, 130, 246, 0.5);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.input-group input::placeholder,
+.input-group select {
+    color: var(--text-dim);
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim);
+    font-size: 1.125rem;
+    pointer-events: none;
+    transition: color 0.3s;
+}
+
+.input-group:focus-within .input-icon {
+    color: var(--accent-blue);
+}
+
+.toggle-password {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    padding: 0;
+    font-size: 1.125rem;
+    transition: color 0.3s;
+}
+
+.toggle-password:hover {
+    color: var(--text-light);
+}
+
+/* Login Links */
+.login-links {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1rem 0;
+    font-size: 0.875rem;
+}
+
+.link-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: color 0.3s;
+    font-size: 0.875rem;
+}
+
+.link-btn:hover {
+    color: var(--accent-blue);
+}
+
+/* Login Button */
+.login-btn {
+    width: 100%;
+    padding: 0.875rem;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    border: none;
+    border-radius: 0.75rem;
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.login-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #3b82f6, #a855f7);
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(37, 99, 235, 0.3);
+}
+
+.login-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.login-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Footer */
+.trc-footer {
+    margin-top: 4rem;
+    text-align: center;
+}
+
+.footer-text {
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+}
+
+.trc-footer a {
+    text-decoration: none;
+}
+
+.trc-footer a:hover .footer-text {
+    color: var(--text-light);
+}
+
+/* Modal Overlay */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    z-index: 100;
+}
+
+/* Modals */
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 448px;
+    background: #0f0f1a;
+    border: 1px solid var(--border-light);
+    border-radius: 1rem;
+    padding: 2rem;
+    z-index: 101;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+.modal-glow {
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 160px;
+    height: 160px;
+    background: rgba(59, 130, 246, 0.2);
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+}
+
+.modal h2 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* Password Requirements */
+.password-requirements {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-light);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    margin: 1rem 0;
+    font-size: 0.75rem;
+}
+
+.password-requirements p {
+    color: #9ca3af;
+    margin-bottom: 0.25rem;
+}
+
+.password-requirements ul {
+    padding-left: 1.5rem;
+    color: var(--text-dim);
+}
+
+/* Modal Buttons */
+.modal-buttons {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 2rem;
+}
+
+.modal-btn {
+    flex: 1;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+}
+
+.modal-btn.cancel {
+    background: transparent;
+    border: 1px solid var(--border-light);
+    color: var(--text-light);
+}
+
+.modal-btn.cancel:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.modal-btn.confirm {
+    background: var(--accent-blue);
+    color: white;
+}
+
+.modal-btn.confirm:hover {
+    background: #2563eb;
+}
+
+/* Message Popups */
+.message-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 102;
+    min-width: 300px;
+}
+
+.popup-content {
+    background: #0f0f1a;
+    border: 1px solid var(--border-light);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.popup-content i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.message-popup.error .popup-content i {
+    color: #ef4444;
+}
+
+.message-popup.success .popup-content i {
+    color: #10b981;
+}
+
+.popup-content p {
+    margin-bottom: 1.5rem;
+}
+
+.popup-content button {
+    padding: 0.5rem 2rem;
+    background: transparent;
+    border: 1px solid var(--border-light);
+    border-radius: 0.5rem;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.popup-content button:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Select Styles */
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1rem;
+}
+
+select option {
+    background-color: #0f0f1a;
+    color: var(--text-light);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .split-screen {
+        flex-direction: column;
+    }
+    
+    .space-scene {
+        height: 30vh;
+        min-height: 200px;
+    }
+    
+    .login-section {
+        width: 100%;
+        height: 70vh;
+        border-left: none;
+        border-top: 1px solid var(--border-light);
+    }
+    
+    .planet-system {
+        transform: scale(0.5);
+    }
+    
+    .space-message {
+        display: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .login-section {
+        padding: 2rem 1rem;
+    }
+    
+    .planet-system {
+        transform: scale(0.4);
+    }
+    
+    .modal {
+        padding: 1.5rem;
+    }
+    
+    .modal-buttons {
+        flex-direction: column;
+    }
+}
+
+/* Alpine.js Transitions */
+[x-cloak] {
+    display: none !important;
+}
+
+[x-transition\:enter] {
+    transition: all 0.3s ease-out;
+}
+
+[x-transition\:leave] {
+    transition: all 0.3s ease-in;
+}
