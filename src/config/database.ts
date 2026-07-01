@@ -14,20 +14,19 @@ const dbConfig = {
         idleTimeoutMillis: 30000
     },
     options: {
-        encrypt: false, // Use true se estiver no Azure
-        trustServerCertificate: true // Importante para conexões locais/intranet
+        encrypt: false,
+        trustServerCertificate: true
     }
 };
 
-// Criamos uma única instância de conexão (Singleton)
 const poolPromise = new sql.ConnectionPool(dbConfig)
     .connect()
     .then(pool => {
-        console.log('✅ Conectado ao banco de dados SQL Server com sucesso!');
+        console.log('✅ Conectado ao SQL Server');
         return pool;
     })
     .catch(err => {
-        console.error('❌ Erro ao conectar no banco de dados: ', err);
+        console.error('❌ Erro no banco:', err);
         process.exit(1);
     });
 

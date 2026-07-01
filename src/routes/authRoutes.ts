@@ -1,9 +1,12 @@
 import { Router } from 'express';
-import { loginLdap } from '../controllers/authController';
+import { loginLdap, updatePreferences } from '../controllers/authController';
+import { authMiddleware } from '../middlewares/authMiddleware';
 
 const router = Router();
 
-// Rota POST para /api/auth/login
 router.post('/login', loginLdap);
+
+// NOVA ROTA: Salva as preferências de layout do usuário
+router.post('/preferences', authMiddleware, updatePreferences);
 
 export default router;

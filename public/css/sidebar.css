@@ -1,0 +1,398 @@
+/* =========================================================
+   SIDEBAR - ESTRUTURA BASE (ABERTA)
+========================================================= */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: var(--sidebar-collapsed);
+    background: var(--bg-surface);
+    border-right: 1px solid var(--border-color);
+    backdrop-filter: blur(20px);
+    display: flex;
+    flex-direction: column;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+    overflow-x: hidden;
+}
+
+body.sidebar-hovered .sidebar,
+body.sidebar-pinned .sidebar {
+    width: var(--sidebar-width);
+}
+
+/* --- HEADER DA SIDEBAR --- */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    min-width: var(--sidebar-width);
+}
+
+.sidebar-logo {
+    height: 40px;
+    transition: opacity 0.3s;
+}
+
+.short-logo {
+    display: none;
+    height: 35px;
+    margin: 0 auto;
+}
+
+.pin-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color 0.3s, transform 0.3s;
+}
+
+.pin-btn:hover {
+    color: var(--accent);
+}
+
+.pin-btn.active {
+    color: var(--accent);
+    transform: rotate(45deg);
+}
+
+/* --- PERFIL DO USUÁRIO --- */
+.sidebar-user-profile {
+    padding: 0 20px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    min-width: var(--sidebar-width);
+}
+
+.sidebar-avatar-container {
+    position: relative;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.AVTP-avatar-wrapper {
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 10px;
+    border: 2px solid var(--accent);
+    width: 64px;
+    height: 64px;
+    transition: all 0.3s ease;
+}
+
+.AVTP-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.AVTP-edit-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.sidebar-avatar-container:hover .AVTP-edit-overlay {
+    opacity: 1;
+}
+
+.status-dot {
+    position: absolute;
+    bottom: 10px;
+    right: 0px;
+    width: 16px;
+    height: 16px;
+    background: #10b981;
+    border: 3px solid var(--bg-surface);
+    border-radius: 50%;
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+.user-info {
+    text-align: center;
+}
+
+.user-info h4 {
+    color: var(--text-primary);
+    margin-bottom: 5px;
+}
+
+.user-role {
+    font-size: 0.8rem;
+    color: var(--accent);
+    background: rgba(59, 130, 246, 0.1);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+.calendar-widget {
+    margin-top: 15px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.calendar-widget:hover {
+    color: var(--accent);
+}
+
+/* Textos Curtos (Escondidos na versão aberta) */
+.short-name,
+.short-date {
+    display: none;
+}
+
+/* --- NAVEGAÇÃO SANFONA --- */
+.sidebar-nav {
+    flex: 1;
+    padding: 20px 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+    width: 5px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 5px;
+}
+
+.nav-item-group {
+    min-width: var(--sidebar-width);
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.menu-icon {
+    width: 40px;
+    font-size: 1.2rem;
+    transition: color 0.3s;
+}
+
+.nav-link:hover .menu-icon,
+.nav-link.active .menu-icon {
+    color: var(--accent);
+}
+
+.nav-text {
+    flex: 1;
+    font-weight: 500;
+}
+
+.arrow-icon {
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+}
+
+.rotate-90 {
+    transform: rotate(90deg);
+}
+
+.submenu {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.submenu-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px 12px 60px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+    border-left: 2px solid transparent;
+}
+
+.submenu-link i {
+    width: 30px;
+    font-size: 1rem;
+}
+
+.submenu-link:hover {
+    color: var(--accent);
+    border-left: 2px solid var(--accent);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* --- BOTÃO LOGOFF --- */
+.sidebar-logoff-button {
+    width: 100%;
+    padding: 20px 15px;
+    background: linear-gradient(to right, #e74c3c, #c0392b);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 1.05rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s;
+    min-width: var(--sidebar-width);
+}
+
+.sidebar-logoff-button:hover {
+    background: linear-gradient(to right, #c0392b, #a93226);
+}
+
+
+/* =========================================================
+   ESTILOS DA SIDEBAR ENCOLHIDA (COLLAPSED) 100% CORRIGIDO
+========================================================= */
+
+/* Logo e Header */
+body:not(.sidebar-hovered):not(.sidebar-pinned) .sidebar-header {
+    justify-content: center;
+    padding: 20px 0;
+}
+
+body:not(.sidebar-hovered):not(.sidebar-pinned) .sidebar-logo:not(.short-logo) {
+    display: none;
+}
+
+body:not(.sidebar-hovered):not(.sidebar-pinned) .short-logo {
+    display: block;
+}
+
+body:not(.sidebar-hovered):not(.sidebar-pinned) .pin-btn {
+    display: none !important;
+}
+
+/* Esconde o pin para centralizar a logo ícone perfeitamente */
+
+/* Avatar, Iniciais e Data */
+body:not(.sidebar-hovered):not(.sidebar-pinned) .sidebar-user-profile {
+    padding: 15px 0;
+}
+
+body:not(.sidebar-hovered):not(.sidebar-pinned) .AVTP-avatar-wrapper {
+    width: 40px;
+    height: 40px;
+    border-width: 2px;
+}
+
+body:not(.sidebar-hovered):not(.sidebar-pinned) .status-dot {
+    width: 12px;
+    height: 12px;
+    bottom: 8px;
+    right: -2px;
+}
+
+/* Esconde textos longos */
+body:not(.sidebar-hovered):not(.sidebar-pinned) .full-name,
+body:not(.sidebar-hovered):not(.sidebar-pinned) .user-role {
+    display: none;
+}
+
+/* Exibe textos curtos (GL e 19/03) e ajusta o layout para coluna */
+body:not(.sidebar-hovered):not(.sidebar-pinned) .user-info,
+body:not(.sidebar-hovered):not(.sidebar-pinned) .calendar-widget {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 8px;
+}
+
+body:not(.sidebar-hovered):not(.sidebar-pinned) .short-name {
+    display: block;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+body:not(.sidebar-hovered):not(.sidebar-pinned) .short-date {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+body:not(.sidebar-hovered):not(.sidebar-pinned) .calendar-widget i {
+    margin: 0 0 4px 0;
+    font-size: 1.1rem;
+}
+
+/* Centraliza os Ícones do Menu (O Segredo do Bug estava aqui) */
+body:not(.sidebar-hovered):not(.sidebar-pinned) .nav-link {
+    justify-content: center;
+    padding: 15px 0;
+}
+
+body:not(.sidebar-hovered):not(.sidebar-pinned) .menu-icon {
+    margin: 0;
+    width: auto;
+    font-size: 1.4rem;
+}
+
+/* O textinho tem que sumir fisicamente da tela, se não ele empurra o ícone pro lado */
+body:not(.sidebar-hovered):not(.sidebar-pinned) .nav-text,
+body:not(.sidebar-hovered):not(.sidebar-pinned) .arrow-icon,
+body:not(.sidebar-hovered):not(.sidebar-pinned) .submenu {
+    display: none !important;
+}
+
+/* Transforma o Botão Logoff num Ícone Vermelho Elegante */
+body:not(.sidebar-hovered):not(.sidebar-pinned) .sidebar-logoff-text {
+    display: none;
+}
+
+body:not(.sidebar-hovered):not(.sidebar-pinned) .sidebar-logoff-button {
+    background: transparent;
+    color: #ef4444;
+    padding: 20px 0;
+    justify-content: center;
+}
+
+body:not(.sidebar-hovered):not(.sidebar-pinned) .sidebar-logoff-button:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+body:not(.sidebar-hovered):not(.sidebar-pinned) .sidebar-logoff-button i {
+    margin: 0;
+    font-size: 1.6rem;
+}
+
+/* Correção do "Sumiço": Força as caixas a terem apenas 80px quando a sidebar fechar */
+body:not(.sidebar-hovered):not(.sidebar-pinned) .sidebar-header,
+body:not(.sidebar-hovered):not(.sidebar-pinned) .sidebar-user-profile,
+body:not(.sidebar-hovered):not(.sidebar-pinned) .nav-item-group,
+body:not(.sidebar-hovered):not(.sidebar-pinned) .nav-link,
+body:not(.sidebar-hovered):not(.sidebar-pinned) .sidebar-footer,
+body:not(.sidebar-hovered):not(.sidebar-pinned) .sidebar-logoff-button {
+    min-width: var(--sidebar-collapsed);
+}

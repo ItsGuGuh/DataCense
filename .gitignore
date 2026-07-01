@@ -1,8 +1,27 @@
 # Dependências do Node
-node_modules/
+/node_modules/
+/*.json
 
-# Arquivos de ambiente e senhas (MUITO IMPORTANTE)
+# Arquivos de ambiente e senhas
 .env
 
 # Arquivos compilados do TypeScript
-dist/
+/dist/
+/temp/
+
+# Arquivos de Treinamento, Script e TV
+/public/assets/files/treinamentos/*
+/public/pages/basedeconhecimento/**/*.pdf
+/public/assets/img/treinamentos/capas/*.png
+/public/assets/tv/**/*.mp4
+/public/assets/tv_thumbs/*
+
+# Arquivos de Postagens
+/public/assets/img/post/*
+/public/assets/video/post/*
+
+# Arquivos de Chamados
+/public/assets/chamados/respondidos/*
+!/public/assets/chamados/respondidos/.gitkeep
+/public/assets/chamados/solicitacoes/*
+!/public/assets/chamados/solicitacoes/.gitkeep

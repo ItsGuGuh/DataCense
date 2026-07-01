@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu | Wiki</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <script src="/js/app.js"></script>
+</head>
+
+<body x-data="dashboardApp()" :data-theme="currentTheme"
+    :class="{ 'sidebar-pinned': isPinned, 'sidebar-hovered': isHovered }">
+
+    <div id="sidebar-container" @mouseenter="if(!isPinned) isHovered = true"
+        @mouseleave="if(!isPinned) isHovered = false" x-html="sidebarHtml">
+    </div>
+
+    <main class="main-content">
+        <div x-html="headerHtml"></div>
+
+        <div class="dashboard-grid">
+            <div class="noticias-feed">
+                <h2 class="feed-title">Últimas Publicações</h2>
+                <div id="post-container">
+
+                    <template x-for="post in posts" :key="post.id">
+                        <div class="post-card">
+
+                            <template x-if="post.OgtCheckMark == 1">
+                                <div class="post-read-marker">
+                                    <template x-if="!post.lidoDefinitivo">
+                                        <button class="read-btn unread" @click="marcarComoLido(post.id)">
+                                            <i class="far fa-check-circle"></i> Marcar como Lido
+                                        </button>
+                                    </template>
+                                    <template x-if="post.lidoDefinitivo">
+                                        <div class="read-status">
+                                            <i class="fas fa-check-double"></i> Lido
+                                        </div>
+                                    </template>
+                                    <span class="read-count"><span x-text="post.PostIsRead"></span> views</span>
+                                </div>
+                            </template>
+
+                            <div class="post-header">
+                                <img :src="'/assets/img/avatar/' + post.username + '.png'"
+                                    @error="$event.target.src='/assets/icons/default-avatar.png'" class="post-avatar">
+                                <div class="author-info">
+                                    <span class="author-name" x-text="formatName(post.username)"></span>
+                                    <span class="post-date" x-text="formatDate(post.data_publicacao)"></span>
+                                </div>
+                            </div>
+
+                            <h3 class="post-title" x-text="post.titulo"></h3>
+
+                            <div class="post-media" x-show="post.post_image">
+                                <template x-if="post.post_type === 'imagem'">
+                                    <div class="post-image">
+                                        <img :src="post.post_image" alt="Imagem"
+                                            @click="abrirLightbox(post.post_image)">
+                                    </div>
+                                </template>
+                                <template x-if="post.post_type === 'video'">
+                                    <div class="video-wrapper" x-data="{ isMuted: true }">
+                                        <video :src="post.post_image" :muted="isMuted" autoplay loop
+                                            playsinline></video>
+                                        <button class="custom-mute-btn" @click="isMuted = !isMuted">
+                                            <i class="fas" :class="isMuted ? 'fa-volume-xmark' : 'fa-volume-high'"></i>
+                                        </button>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <p class="post-description" x-html="post.post_description" style="margin-bottom: 20px;"></p>
+
+                            <template x-if="post.Reacoes == 1">
+                                <div class="post-reactions">
+                                    <button class="reaction-btn" @click="reagir(post.id, 1)" title="Gostei">
+                                        <span class="reaction-count" x-text="post.Emoji1"></span><img
+                                            src="/assets/reactions/emoji1.gif" class="reaction-gif">
+                                    </button>
+                                    <button class="reaction-btn" @click="reagir(post.id, 2)" title="Amei">
+                                        <span class="reaction-count" x-text="post.Emoji2"></span><img
+                                            src="/assets/reactions/emoji2.gif" class="reaction-gif">
+                                    </button>
+                                    <button class="reaction-btn" @click="reagir(post.id, 3)" title="Uau">
+                                        <span class="reaction-count" x-text="post.Emoji3"></span><img
+                                            src="/assets/reactions/emoji3.gif" class="reaction-gif">
+                                    </button>
+                                    <button class="reaction-btn" @click="reagir(post.id, 4)" title="Engraçado">
+                                        <span class="reaction-count" x-text="post.Emoji4"></span><img
+                                            src="/assets/reactions/emoji4.gif" class="reaction-gif">
+                                    </button>
+                                    <button class="reaction-btn" @click="reagir(post.id, 5)" title="Não Gostei">
+                                        <span class="reaction-count" x-text="post.Emoji5"></span><img
+                                            src="/assets/reactions/emoji5.gif" class="reaction-gif">
+                                    </button>
+                                </div>
+                            </template>
+
+                            <div class="post-admin-actions" x-show="hasPermission('Apolo')">
+                                <button class="admin-action-btn edit" title="Editar" @click="editarPost(post.id)"><i
+                                        class="fas fa-edit"></i></button>
+                                <button class="admin-action-btn delete" title="Apagar" @click="deletarPost(post.id)"><i
+                                        class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <template x-if="posts.length === 0 && !carregandoPosts">
+                        <div class="no-posts" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                            <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                            <p>Nenhuma publicação encontrada para o seu perfil.</p>
+                        </div>
+                    </template>
+
+                    <template x-if="carregandoPosts">
+                        <div class="loading-posts" style="text-align: center; padding: 20px; color: var(--accent);">
+                            <i class="fas fa-spinner fa-spin fa-2x"></i>
+                            <p style="margin-top: 10px;">Carregando publicações...</p>
+                        </div>
+                    </template>
+
+                    <template x-if="temMaisPosts && posts.length > 0">
+                        <div class="load-more-container" style="text-align: center; margin: 30px 0;">
+                            <button class="load-more-btn" @click="loadMorePosts()" :disabled="carregandoPosts"
+                                style="background: var(--bg-surface); border: 1px solid var(--accent); color: var(--accent); padding: 12px 30px; border-radius: 25px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                                <i class="fas fa-plus" x-show="!carregandoPosts"></i>
+                                <i class="fas fa-spinner fa-spin" x-show="carregandoPosts"></i>
+                                Veja Mais
+                            </button>
+                        </div>
+                    </template>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="lightbox-overlay" x-show="modais.lightbox" x-transition.opacity x-cloak
+            @click.away="modais.lightbox = false">
+            <button class="lightbox-close" @click="modais.lightbox = false"><i class="fas fa-times"></i></button>
+            <img :src="lightboxUrl" class="lightbox-img" @click.stop>
+        </div>
+
+    </main>
+
+</body>
+
+</html>

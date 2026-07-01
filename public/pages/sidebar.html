@@ -1,0 +1,480 @@
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <img src="/assets/logos/Logo_WikiTRC.png" alt="Logo" class="sidebar-logo">
+        <img src="/assets/logos/Logotipo_WikiTRC.png" alt="Logo" class="sidebar-logo short-logo">
+
+        <button class="pin-btn" @click="togglePin()" :class="{ 'active': isPinned }">
+            <i class="fas fa-thumbtack"></i>
+        </button>
+    </div>
+
+    <div class="sidebar-user-profile">
+        <div class="sidebar-avatar-container" @click="abrirModalAvatar()" title="Abrir Perfil do Usuário">
+            <div class="AVTP-avatar-wrapper">
+                <img :src="getAvatarUrl()" @error="$event.target.src='/assets/icons/default-avatar.png'" alt="Avatar"
+                    class="AVTP-avatar">
+                <div class="AVTP-edit-overlay"><i class="fas fa-pencil-alt"></i></div>
+            </div>
+            <div class="status-dot"></div>
+        </div>
+        <div class="user-info">
+            <h4 class="full-name" x-text="userData.formattedName"></h4>
+            <h4 class="short-name" x-text="getInitials(userData.formattedName)"></h4>
+
+            <span class="user-role" x-text="userData.role"></span>
+        </div>
+        <div class="calendar-widget" @click="modais.calendar = true" title="Histórico de Login">
+            <i class="far fa-calendar-alt"></i>
+            <span class="full-name" x-text="new Date().toLocaleDateString('pt-BR')"></span>
+            <span class="short-date" x-text="getShortDate()"></span>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <div class="nav-item-group" x-data="{ open: false }"
+            x-show="hasAnyPermission(['inicio_base', 'inicio_treinos', 'inicio_quiz', 'inicio_pesquisa', 'inicio_hop'])">
+            <a href="#" class="nav-link" @click.prevent="open = !open" :class="{'active': open}">
+                <i class="fas fa-home menu-icon"></i>
+                <span class="nav-text">Início</span>
+                <i class="fas fa-chevron-right arrow-icon" :class="{'rotate-90': open}"></i>
+            </a>
+            <div class="submenu" x-show="open" x-collapse>
+                <a href="/pages/basedeconhecimento.html" class="submenu-link" x-show="hasPermission('inicio_base')"><i
+                        class="fas fa-book"></i> Base de Conhecimento</a>
+                <a href="/pages/t&d/treinamento/treinamentos.html" class="submenu-link"
+                    x-show="hasPermission('inicio_treinos')"><i class="fas fa-graduation-cap"></i> Meus Treinamentos</a>
+                <a href="/pages/t&d/quiz/TED-QUIZ-visualizar.html" class="submenu-link"
+                    x-show="hasPermission('inicio_quiz')"><i class="fa-solid fa-puzzle-piece"></i> Meus Quizzes</a>
+                <a href="/pages/t&d/pesquisa/pesquisa_visualizar.html" class="submenu-link"
+                    x-show="hasPermission('inicio_pesquisa')"><i class="fa-solid fa-magnifying-glass"></i> Minhas
+                    Pesquisas</a>
+                <a href="/pages/hop_center/menu.html" class="submenu-link" x-show="hasPermission('inicio_hop')"><i
+                        class="fas fa-eye"></i> Hop Center</a>
+            </div>
+        </div>
+
+        <div class="nav-item-group" x-data="{ open: false }"
+            x-show="hasAnyPermission(['qi_operador', 'qi_cadastro', 'qi_contestacoes', 'qi_analitico', 'qi_semanal', 'qi_dashboard', 'qi_importar', 'qi_configuracoes'])">
+            <a href="#" class="nav-link" @click.prevent="open = !open" :class="{'active': open}">
+                <i class="fas fa-headphones-simple menu-icon"></i>
+                <span class="nav-text">QualityInsight</span>
+                <i class="fas fa-chevron-right arrow-icon" :class="{'rotate-90': open}"></i>
+            </a>
+            <div class="submenu" x-show="open" x-collapse>
+                <a href="/pages/QualityInsight/dashboard_op.html" class="submenu-link"
+                    x-show="hasPermission('qi_operador')"><i class="fas fa-user"></i> Área do Operador</a>
+                <a href="/pages/QualityInsight/cadastro_avaliacoes.html" class="submenu-link"
+                    x-show="hasPermission('qi_cadastro')"><i class="fas fa-plus-circle"></i> Cadastro de Avaliações</a>
+                <a href="/pages/QualityInsight/lista_contests.html" class="submenu-link"
+                    x-show="hasPermission('qi_contestacoes')"><i class="fas fa-flag"></i> Contestações</a>
+                <a href="/pages/QualityInsight/analitico_avaliacoes.html" class="submenu-link"
+                    x-show="hasPermission('qi_analitico')"><i class="fas fa-chart-bar"></i> Analítico de Avaliações</a>
+                <a href="/pages/QualityInsight/relatorio_semanas_monitoria.html" class="submenu-link"
+                    x-show="hasPermission('qi_semanal')"><i class="fa-solid fa-calendar-days"></i> Acompanhamento
+                    Semanal</a>
+                <a href="/pages/QualityInsight/dashboard.html" class="submenu-link"
+                    x-show="hasPermission('qi_dashboard')"><i class="fas fa-chart-line"></i> Dashboard Geral</a>
+                <a href="/pages/QualityInsight/importar_avaliacoes.html" class="submenu-link"
+                    x-show="hasPermission('qi_importar')"><i class="fa-solid fa-upload"></i> Importar Avaliações</a>
+                <a href="/pages/QualityInsight/configuracoes.html" class="submenu-link"
+                    x-show="hasPermission('qi_configuracoes')"><i class="fas fa-gear"></i> Configurações</a>
+            </div>
+        </div>
+
+        <div class="nav-item-group" x-data="{ open: false }"
+            x-show="hasAnyPermission(['mkt_novo_post', 'mkt_formularios'])">
+            <a href="#" class="nav-link" @click.prevent="open = !open" :class="{'active': open}">
+                <i class="fas fa-lightbulb menu-icon"></i>
+                <span class="nav-text">Marketing</span>
+                <i class="fas fa-chevron-right arrow-icon" :class="{'rotate-90': open}"></i>
+            </a>
+            <div class="submenu" x-show="open" x-collapse>
+                <a href="/pages/apolo/novo_post.html" class="submenu-link" x-show="hasPermission('mkt_novo_post')"><i
+                        class="fas fa-plus-circle"></i> Novo Post</a>
+                <a href="/pages/Forms/index.html" class="submenu-link" x-show="hasPermission('mkt_formularios')"><i
+                        class="fas fa-square-check"></i> Formulários</a>
+            </div>
+        </div>
+
+        <div class="nav-item-group" x-data="{ open: false }"
+            x-show="hasAnyPermission(['ted_nova_ficha', 'ted_novo_treinamento', 'ted_quiz_cadastrar', 'ted_nova_pesquisa', 'ted_dashboard', 'ted_treinamentos_listar', 'ted_configuracoes'])">
+            <a href="#" class="nav-link" @click.prevent="open = !open" :class="{'active': open}">
+                <i class="fas fa-users-cog menu-icon"></i>
+                <span class="nav-text">T&D</span>
+                <i class="fas fa-chevron-right arrow-icon" :class="{'rotate-90': open}"></i>
+            </a>
+            <div class="submenu" x-show="open" x-collapse>
+                <a href="/pages/t&d/treinamento/treinamento_cadastro.html" class="submenu-link"
+                    x-show="hasPermission('ted_nova_ficha')"><i class="fas fa-clipboard-list"></i> Nova Ficha</a>
+                <a href="/pages/t&d/treinamento/novo_treinamento.html" class="submenu-link"
+                    x-show="hasPermission('ted_novo_treinamento')"><i class="fas fa-file"></i> Novo Treinamento</a>
+                <a href="/pages/t&d/quiz/TED-QUIZ-cadastrar.html" class="submenu-link"
+                    x-show="hasPermission('ted_quiz_cadastrar')"><i class="fa-solid fa-square-plus"></i> Novo Quiz</a>
+                <a href="/pages/t&d/pesquisa/pesquisa_cadastro.html" class="submenu-link"
+                    x-show="hasPermission('ted_nova_pesquisa')"><i class="fa-solid fa-magnifying-glass-plus"></i> Nova
+                    Pesquisa</a>
+                <a href="/pages/t&d/dashboard/dashboard.html" class="submenu-link"
+                    x-show="hasPermission('ted_dashboard')"><i class="fas fa-chart-line"></i> Dashboard Geral</a>
+                <a href="/pages/t&d/treinamento/treinamentos_new.html" class="submenu-link"
+                    x-show="hasPermission('ted_treinamentos_listar')"><i class="fas fa-sliders"></i> Lista de
+                    Treinamentos</a>
+                <a href="/pages/t&d/configuracoes.html" class="submenu-link"
+                    x-show="hasPermission('ted_configuracoes')"><i class="fas fa-gear"></i> Configurações</a>
+            </div>
+        </div>
+
+        <div class="nav-item-group" x-data="{ open: false }" x-show="hasAnyPermission(['acoes_notificacao'])">
+            <a href="#" class="nav-link" @click.prevent="open = !open" :class="{'active': open}">
+                <i class="fas fa-bolt menu-icon"></i>
+                <span class="nav-text">Ações</span>
+                <i class="fas fa-chevron-right arrow-icon" :class="{'rotate-90': open}"></i>
+            </a>
+            <div class="submenu" x-show="open" x-collapse>
+                <a href="/pages/acoes/notificacoes/criar_notificacao.html" class="submenu-link"
+                    x-show="hasPermission('acoes_notificacao')"><i class="fas fa-comment-medical"></i> Criar
+                    Notificação</a>
+            </div>
+        </div>
+
+        <div class="nav-item-group" x-data="{ open: false }" x-show="hasAnyPermission(['rh_atualizacoes'])">
+            <a href="#" class="nav-link" @click.prevent="open = !open" :class="{'active': open}">
+                <i class="fas fa-users menu-icon"></i>
+                <span class="nav-text">RH</span>
+                <i class="fas fa-chevron-right arrow-icon" :class="{'rotate-90': open}"></i>
+            </a>
+            <div class="submenu" x-show="open" x-collapse>
+                <a href="/pages/RH/registro_atualizacoes.html" class="submenu-link"
+                    x-show="hasPermission('rh_atualizacoes')"><i class="fa-solid fa-clipboard-list"></i> Atualizações de
+                    Cadastro</a>
+            </div>
+        </div>
+
+        <div class="nav-item-group" x-data="{ open: false }"
+            x-show="hasAnyPermission(['ada_tia', 'ada_gestao', 'ada_colabcenter', 'ada_gravacoes', 'ada_grade'])">
+            <a href="#" class="nav-link" @click.prevent="open = !open" :class="{'active': open}">
+                <i class="fas fa-cogs menu-icon"></i>
+                <span class="nav-text">Áreas de Apoio</span>
+                <i class="fas fa-chevron-right arrow-icon" :class="{'rotate-90': open}"></i>
+            </a>
+            <div class="submenu" x-show="open" x-collapse>
+                <a href="/pages/areas_de_apoio/planejamento/TIA/acompanhamento_tia.html" class="submenu-link"
+                    x-show="hasPermission('ada_tia')"><i class="fas fa-chart-bar"></i> Acompanhamento TIA</a>
+                <a href="/pages/apolo/tripulacao.html" class="submenu-link" x-show="hasPermission('ada_gestao')"><i
+                        class="fas fa-user-shield"></i> Gestão</a>
+                <a href="/pages/areas_de_apoio/colabcenter/colabcenter.html" class="submenu-link"
+                    x-show="hasPermission('ada_colabcenter')"><i class="fas fa-chalkboard-teacher"></i> ColabCenter</a>
+                <a href="/pages/areas_de_apoio/busca_gravacoes/busca_gravacoes.html" class="submenu-link"
+                    x-show="hasPermission('ada_gravacoes')"><i class="fas fa-music"></i> Busca de Gravações</a>
+                <a href="/pages/apolo/grade/grade.html" class="submenu-link" x-show="hasPermission('ada_grade')"><i
+                        class="fas fa-calendar-days"></i> Grade</a>
+            </div>
+        </div>
+
+        <div class="nav-item-group" x-data="{ open: false }" x-show="hasAnyPermission(['ia_historico'])">
+            <a href="#" class="nav-link" @click.prevent="open = !open" :class="{'active': open}">
+                <i class="fas fa-microchip menu-icon"></i>
+                <span class="nav-text">Luma IA</span>
+                <i class="fas fa-chevron-right arrow-icon" :class="{'rotate-90': open}"></i>
+            </a>
+            <div class="submenu" x-show="open" x-collapse>
+                <a href="/pages/chatgpt/historico-chat.html" class="submenu-link"
+                    x-show="hasPermission('ia_historico')"><i class="fa-solid fa-box-archive"></i> Histórico de Chat</a>
+            </div>
+        </div>
+
+        <div class="nav-item-group" x-data="{ open: false }" x-show="hasAnyPermission(['ajuda_faq'])">
+            <a href="#" class="nav-link" @click.prevent="open = !open" :class="{'active': open}">
+                <i class="fas fa-question-circle menu-icon"></i>
+                <span class="nav-text">Ajuda</span>
+                <i class="fas fa-chevron-right arrow-icon" :class="{'rotate-90': open}"></i>
+            </a>
+            <div class="submenu" x-show="open" x-collapse>
+                <a href="/pages/ajuda/faq.html" class="submenu-link" x-show="hasPermission('ajuda_faq')"><i
+                        class="fas fa-question"></i> FAQ</a>
+            </div>
+        </div>
+
+        <div class="nav-item-group" x-data="{ open: false }"
+            x-show="hasAnyPermission(['sobre_lunarloots', 'sobre_apolopass', 'sobre_galactos', 'sobre_pdp'])">
+            <a href="#" class="nav-link" @click.prevent="open = !open" :class="{'active': open}">
+                <i class="fas fa-info-circle menu-icon"></i>
+                <span class="nav-text">Sobre</span>
+                <i class="fas fa-chevron-right arrow-icon" :class="{'rotate-90': open}"></i>
+            </a>
+            <div class="submenu" x-show="open" x-collapse>
+                <a href="/pages/sobre/infolunarloots.html" class="submenu-link"
+                    x-show="hasPermission('sobre_lunarloots')"><i class="fas fa-coins"></i> LunarLoots</a>
+                <a href="/pages/sobre/infoapolopass.html" class="submenu-link"
+                    x-show="hasPermission('sobre_apolopass')"><i class="fas fa-id-card"></i> ApoloPass</a>
+                <a href="/pages/sobre/infogalactos.html" class="submenu-link"
+                    x-show="hasPermission('sobre_galactos')"><i class="fas fa-coins"></i> Galactos</a>
+                <a href="/pages/sobre/pdp.html" class="submenu-link" x-show="hasPermission('sobre_pdp')"><i
+                        class="fas fa-coins"></i> Política de Privacidade</a>
+            </div>
+        </div>
+
+        <div class="nav-item-group" x-data="{ open: false }"
+            x-show="hasAnyPermission(['chamados_abrir', 'chamados_listar'])">
+            <a href="#" class="nav-link" @click.prevent="open = !open" :class="{'active': open}">
+                <i class="fa-brands fa-rocketchat menu-icon"></i>
+                <span class="nav-text">Chamados</span>
+                <i class="fas fa-chevron-right arrow-icon" :class="{'rotate-90': open}"></i>
+            </a>
+            <div class="submenu" x-show="open" x-collapse>
+                <a href="/pages/ajuda/chamados/abrir_chamado.html" class="submenu-link"
+                    x-show="hasPermission('chamados_abrir')"><i class="fas fa-paper-plane"></i> Abrir Chamado</a>
+                <a href="/pages/ajuda/chamados/chamados.html" class="submenu-link"
+                    x-show="hasPermission('chamados_listar')"><i class="fas fa-bars-progress"></i> Meus Chamados</a>
+            </div>
+        </div>
+
+        <div class="nav-item-group" x-data="{ open: false }"
+            x-show="hasAnyPermission(['acessos_monitoramento', 'acessos_logs'])">
+            <a href="#" class="nav-link" @click.prevent="open = !open" :class="{'active': open}">
+                <i class="fas fa-fingerprint menu-icon"></i>
+                <span class="nav-text">Acessos</span>
+                <i class="fas fa-chevron-right arrow-icon" :class="{'rotate-90': open}"></i>
+            </a>
+            <div class="submenu" x-show="open" x-collapse>
+                <a href="/pages/ajuda/chamados/abrir_chamado.html" class="submenu-link"
+                    x-show="hasPermission('acessos_monitoramento')"><i class="fas fa-tv"></i> Monitoramento</a>
+                <a href="/pages/acessos/logs.html" class="submenu-link" x-show="hasPermission('acessos_logs')"><i
+                        class="fas fa-gears"></i> Logs</a>
+            </div>
+        </div>
+
+        <div class="nav-item-group" x-data="{ open: false }" x-show="hasAnyPermission([''])">
+            <a href="#" class="nav-link" @click.prevent="open = !open" :class="{'active': open}">
+                <i class="fas fa-user-secret menu-icon"></i>
+                <span class="nav-text">Apolo</span>
+                <i class="fas fa-chevron-right arrow-icon" :class="{'rotate-90': open}"></i>
+            </a>
+            <div class="submenu" x-show="open" x-collapse>
+                <a href="/pages/apolo/aprovar_solicitacoes.html" class="submenu-link"
+                    x-show="hasPermission('apolo_solicitacoes')"><i class="fas fa-check-circle"></i> Solicitações</a>
+                <a href="/pages/apolo/tripulacao.html" class="submenu-link"
+                    x-show="hasPermission('apolo_tripulacao')"><i class="fas fa-users"></i> Tripulação</a>
+                <a href="/pages/apolo/admin_avatars.html" class="submenu-link"
+                    x-show="hasPermission('apolo_avatares')"><i class="fas fa-user-ninja"></i> Criar Avatares</a>
+                <a href="/pages/apolo/admin_tags.html" class="submenu-link" x-show="hasPermission('apolo_tags')"><i
+                        class="fas fa-tags"></i> Criar Tags</a>
+                <a href="/pages/apolo/novo_patch.html" class="submenu-link" x-show="hasPermission('apolo_patch')"><i
+                        class="fas fa-notes-medical"></i> Novo Patch</a>
+                <a href="/pages/apolo/grade/grade.html" class="submenu-link" x-show="hasPermission('apolo_grade')"><i
+                        class="fas fa-calendar-days"></i> Grade</a>
+            </div>
+        </div>
+
+    </nav>
+
+    <div class="sidebar-footer" style="padding: 0;">
+        <button class="sidebar-logoff-button" @click="confirmLogoff()">
+            <i class="fas fa-rocket"></i> <span class="sidebar-logoff-text">Sair da Nave</span>
+        </button>
+    </div>
+</aside>
+
+<div class="popup-overlay" x-show="modais.avatar" x-transition.opacity x-cloak
+    style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; justify-content: center; align-items: center;">
+
+    <div class="profile-modal-container" @click.away="modais.avatar = false" x-data="{ profileTab: 'dados' }">
+
+        <div class="profile-left-panel">
+            <div class="profile-avatar-wrapper">
+                <img :src="getAvatarUrl()" @error="$event.target.src='/assets/icons/default-avatar.png'" alt="Avatar"
+                    class="profile-big-avatar AVTP-avatar">
+            </div>
+
+            <button class="profile-edit-avatar-btn" @click="profileTab = 'avatar'">
+                Editar Avatar <i class="fas fa-pencil-alt"></i>
+            </button>
+
+            <h3 class="profile-name" x-text="userData.formattedName || formatName(userData.username)"></h3>
+            <p class="profile-super">Superior: <span
+                    x-text="userData.super ? formatName(userData.super) : 'Não informado'"></span></p>
+
+            <div class="role-tooltip-wrapper">
+                <span class="profile-role-badge" x-text="userData.role"></span>
+                <div class="role-tooltip">
+                    <strong>Páginas com Acesso:</strong>
+                    <div class="role-perms-list">
+                        <template
+                            x-if="userData.role === 'Apolo' || (userData.permissions && userData.permissions.includes('*'))">
+                            <span class="perm-tag">Acesso Irrestrito</span>
+                        </template>
+                        <template
+                            x-if="userData.role !== 'Apolo' && userData.permissions && !userData.permissions.includes('*')">
+                            <template x-for="perm in userData.permissions" :key="perm">
+                                <span class="perm-tag" x-text="perm"></span>
+                            </template>
+                        </template>
+                        <template
+                            x-if="(!userData.permissions || userData.permissions.length === 0) && userData.role !== 'Apolo'">
+                            <span class="perm-tag">Nenhuma permissão</span>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="profile-divider">
+
+            <div class="profile-nav-buttons">
+                <button class="profile-nav-btn" :class="{'active': profileTab === 'dados'}"
+                    @click="profileTab = 'dados'">
+                    <div class="icon-sphere"><i class="fas fa-id-card"></i></div>
+                    <span>Dados Pessoais</span>
+                </button>
+                <button class="profile-nav-btn" :class="{'active': profileTab === 'atualizacao'}"
+                    @click="profileTab = 'atualizacao'">
+                    <div class="icon-sphere"><i class="fa-solid fa-file-pen"></i></div>
+                    <span>Atualização Cadastral</span>
+                </button>
+                <button class="profile-nav-btn" :class="{'active': profileTab === 'lunarstore'}"
+                    @click="profileTab = 'lunarstore'">
+                    <div class="icon-sphere"><i class="fa-solid fa-cart-shopping"></i></div>
+                    <span>LunarStore</span>
+                </button>
+                <button class="profile-nav-btn" :class="{'active': profileTab === 'inventario'}"
+                    @click="profileTab = 'inventario'">
+                    <div class="icon-sphere"><i class="fa-solid fa-suitcase-rolling"></i></div>
+                    <span>Inventário</span>
+                </button>
+                <button class="profile-nav-btn" :class="{'active': profileTab === 'carteira'}"
+                    @click="profileTab = 'carteira'">
+                    <div class="icon-sphere"><i class="fa-solid fa-wallet"></i></div>
+                    <span>Carteira</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="profile-right-panel">
+            <button class="profile-close-absolute" @click="modais.avatar = false"><i class="fas fa-times"></i></button>
+
+            <div x-show="profileTab === 'avatar'" class="profile-tab-content" x-transition.opacity>
+                <div class="updates-header"
+                    style="display: flex; justify-content: space-between; align-items: center; padding: 25px 25px 15px 25px; border-bottom: 1px solid var(--border-color);">
+                    <h2 style="margin: 0; font-size: 1.5rem;"><i class="fas fa-camera-retro"
+                            style="color: var(--accent); margin-right: 10px;"></i> Selecionar Imagem</h2>
+
+                    <div style="display: flex; gap: 15px; align-items: center; margin-right: 50px;">
+                        <button class="upload-avatar-btn"
+                            x-show="hasAnyPermission(['Apolo', 'Qualidade', 'Marketing', 'GP Backoffice'])"
+                            @click="$refs.avatarFileInput.click()">
+                            <i class="fas fa-upload"></i> <span style="font-size: 0.9rem; font-weight: bold;">Foto
+                                Personalizada</span>
+                        </button>
+                        <input type="file" x-ref="avatarFileInput" style="display: none;"
+                            accept="image/png, image/jpeg, image/jpg" @change="iniciarCropper($event)">
+                    </div>
+                </div>
+
+                <div x-show="avatarCarregando" style="padding: 50px; text-align: center; color: var(--accent);">
+                    <i class="fas fa-circle-notch fa-spin fa-3x"></i>
+                    <p style="margin-top: 15px; color: var(--text-secondary);">Buscando banco de imagens...</p>
+                </div>
+
+                <div class="notif-tabs" x-show="!avatarCarregando"
+                    style="overflow-x: auto; white-space: nowrap; padding-bottom: 5px;">
+                    <template x-for="tab in avatarTabs" :key="tab.categoria || tab.category">
+                        <button :class="{'active': avatarAbaAtiva === (tab.categoria || tab.category)}"
+                            @click="avatarAbaAtiva = (tab.categoria || tab.category)">
+                            <span x-text="tab.categoria || tab.category"></span>
+                            <span class="tab-badge all" x-text="tab.avatares ? tab.avatares.length : 0"></span>
+                        </button>
+                    </template>
+                </div>
+
+                <div class="updates-content" x-show="!avatarCarregando"
+                    style="flex: 1; overflow-y: auto; background: transparent; padding: 20px;">
+                    <template x-for="tab in avatarTabs" :key="tab.categoria || tab.category">
+                        <div x-show="avatarAbaAtiva === (tab.categoria || tab.category)" class="avatar-grid">
+                            <template x-for="avatar in tab.avatares" :key="avatar.id">
+                                <div class="avatar-item-wrapper">
+                                    <div class="avatar-card" @click="selecionarAvatar(avatar)" :title="avatar.title">
+                                        <img :src="'/assets/img/avatar/' + (avatar.arquivo || avatar.avatar_file)"
+                                            :alt="avatar.title">
+                                        <div class="avatar-card-overlay"><i class="fas fa-check-circle"></i> Usar</div>
+                                    </div>
+                                    <span class="avatar-name-label" x-text="avatar.title"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <div x-show="profileTab === 'dados'" class="profile-tab-content" x-transition.opacity>
+                <div class="updates-header" style="padding: 25px; border-bottom: 1px solid var(--border-color);">
+                    <h2 style="margin: 0; font-size: 1.5rem;"><i class="fas fa-user-shield"
+                            style="color: var(--accent); margin-right: 10px;"></i> Meus Dados</h2>
+                </div>
+
+                <div class="dados-pessoais-container">
+                    <div class="dado-group">
+                        <label>Usuário de Rede</label>
+                        <div class="dado-input-wrapper">
+                            <i class="fas fa-network-wired"></i>
+                            <input type="text" readonly :value="userData.username" class="dado-input">
+                        </div>
+                    </div>
+                    <div class="dado-group">
+                        <label>Nível de Acesso (Role)</label>
+                        <div class="dado-input-wrapper">
+                            <i class="fas fa-briefcase"></i>
+                            <input type="text" readonly :value="userData.role" class="dado-input">
+                        </div>
+                    </div>
+                    <div class="dado-group">
+                        <label>Superior Imediato</label>
+                        <div class="dado-input-wrapper">
+                            <i class="fas fa-user-tie"></i>
+                            <input type="text" readonly
+                                :value="userData.super ? formatName(userData.super) : 'Não informado'"
+                                class="dado-input">
+                        </div>
+                    </div>
+
+                    <p class="dado-info-text">
+                        <i class="fas fa-info-circle"></i> Estes são seus dados de cadastro no sistema Wiki(DataCense)
+                        validados e fornecidos automaticamente pelo bd interno. Para alterações de acesso ou superior,
+                        entre em contato com seu superior ou abra um chamado para solicitação.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="popup-overlay" x-show="modais.cropper" x-transition.opacity x-cloak
+    style="position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10005; display: flex; justify-content: center; align-items: center;">
+
+    <div class="updates-modal cropper-layout" @click.away="fecharCropper()" style="width: 600px; height: auto;">
+        <div class="updates-header"
+            style="display: flex; justify-content: space-between; padding: 20px; border-bottom: 1px solid var(--border-color);">
+            <h2><i class="fas fa-crop-alt" style="color: var(--accent);"></i> Ajustar Foto</h2>
+            <button class="updates-close-btn" @click="fecharCropper()"
+                style="background: none; border: none; color: var(--text-secondary); cursor: pointer;"><i
+                    class="fas fa-times"></i></button>
+        </div>
+
+        <div class="cropper-container"
+            style="background: #000; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 350px;">
+            <img id="cropper-image" src="" style="max-width: 100%; max-height: 50vh; display: block;">
+        </div>
+
+        <div class="updates-header"
+            style="display: flex; justify-content: flex-end; gap: 15px; padding: 15px 20px; border-top: 1px solid var(--border-color);">
+            <button @click="fecharCropper()"
+                style="background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); padding: 8px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s;">
+                Cancelar
+            </button>
+            <button @click="salvarAvatarCropped()" :disabled="salvandoAvatar"
+                style="background: var(--accent); color: white; border: none; padding: 8px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s;">
+                <span x-show="!salvandoAvatar"><i class="fas fa-save"></i> Salvar Avatar</span>
+                <span x-show="salvandoAvatar"><i class="fas fa-spinner fa-spin"></i> Cortando...</span>
+            </button>
+        </div>
+    </div>
+</div>
